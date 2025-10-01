@@ -1,0 +1,30 @@
+\section{Discussion}
+\label{sec::chp5::discussion}
+
+Going beyond surveys, systematising the knowledge of password guessing algorithms can be highly beneficial to future researchers--our reasoning is as follows.
+
+Our continued understanding of passwords remains critical, as passwords remain the most adopted method of user authentication. The adoption of password-less authentication has remained slow, and we foresee that password will remain the leading authentication system over the next decade. Our continued understanding of it is vital for national security, too. The growth in password attacks and data breaches provides more reasoning on why we should continue research on password security.
+
+The work in this chapter can guide future research efforts. We have identified limitations in previous approaches and various future research efforts. Insights from this analysis can inform the design and development of new authentication systems. 
+
+Password security encompasses various issues that might be relevant to other disciplines. It touches on human-computer interaction (HCI), information security, human psychology, user experience design (UX), and cryptography. Having a common understanding can foster collaboration. This literature can also serve as a source of education.
+
+The days of passwords are not yet over as most systems and web applications still use passwords. Passwords will continue to be used for offline systems, secure and privately networked systems, and for ad hoc usage such as password-protecting files or folders. Password-less schemes have had a slow adoption rate. The adoption of the Web Authentication API (WebAuthn) has been slow, though Passkeys have shown promise because of their usability. For these reasons, we must continue to invest in password security through further research. The purpose of this chapter is to increase the pace of password-security research.
+
+%\subsection{Ethical Considerations}
+%Our work can be argued benefits both researchers and malicious actors. However, we have shown in many instances that the techniques used in academia are rarely practical. Most practical advances in password guessing is done in private or through open-source tooling. If the work is not practical then it has no use, therefore this paper brings awareness to that fact in order to increase their comparison for real world usage.
+%
+%Research on password guessing increases our awareness and allows us to create better security. We can create better password strength meters (PSM) and password composition policies (PCP).
+
+\section{Summary}
+\label{sec::chp5::summary}
+
+This chapter has provided a comprehensive systematisation of knowledge (SoK) of password guessing algorithms, bridging the gap between academic research and practical applications.
+
+First, we address the gap between academic approaches and industry implementations. While practical tools like Hashcat focus on generation speed and hardware optimisation, academic research tends to focus on maximising successful guesses while minimising wasted attempts. We developed a novel framework for evaluating password guessing algorithms that combines both generation quality and speed. Our initial experiments revealed that sophisticated academic methods do not necessarily outperform simpler methods when both factors are considered.
+
+We then provided a detailed overview and potential of Mask Attacks and variants of them. Although mask attacks can significantly reduce the search space and improve guessing efficiency, their effectiveness varies considerably depending on the complexity and structure of the password. The empirical evaluation demonstrated that current deep learning-based mask attack methods struggle with longer passwords and complex structures, particularly passphrases.
+
+\noteBoxGrey{Future Work: Queueing Model}{%
+  \input{chapters/how_passwords/__queue_model}
+}

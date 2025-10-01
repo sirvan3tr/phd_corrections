@@ -1,0 +1,158 @@
+\section{Web Security Attacks}
+\label{sec::chp2::security-attacks}
+
+%TODO: OSI layer attacks
+%\input{chapters/background/table_osi_layer_attacks}
+
+This section provides an overview of malicious techniques used for unauthorised exploitation of web applications (not exclusively) and exfiltration of user secrets. We will refer to some of these attacks through the thesis. The main purpose is for this section to act as a reference and guide. This is a comprehensive version of the OWASP's list of attacks. https://owasp.org/www-community/attacks/
+
+Seldom is a single threat vector used exclusively in the real world. Often, multiples areas of weaknesses are exploited to complete a mission. Therefore, having a broad perspective of these attacks and their relationships with each other is essential.
+
+
+\subsection{Client Side Attacks}
+\label{chp2::client-side-attacks}
+
+\textbf{\textsc{Credential Stuffing Attack.}} Attackers use Credential Stuffing Attack (CSA) to gain unauthorised account and system access. They do this by using compromised login information from previous data breaches. CSA owes its success to the inherent weaknesses in the Password. Such weaknesses include: re-using passwords across different systems and using weak passwords.
+
+The increasing number of data breaches has made this form of attack viable. The heap of data that is often dumped on the internet increases the feasibility of CSA. This accelerating threat has led to the likes of SEC issuing warnings to the industry \cite{noauthor_secgov_2020}.
+
+CSA is one of the many consequences of dumped private data. Others include identity fraud and attempted blackmailing by emailing the victims of the data breaches \cite{noauthor_scam_2020}.
+
+\textbf{\textsc{Man-in-the-Browser.}} MitB is usually a Trojan that infects a system and its applications (typically a browser). Once it infects a browser or an operating-system (OS) it can read network traffic, inject code into web pages, change HTTP headers, and generally manipulate the web page for the benefit of the attacker \cite{noauthor_man---browser_2020}. MitB Trojans are also referred to as \emph{Financial Trojans} because (typically) their aim is commit fraud and steal money from their victims. Such malicious actions are done by form grabbing banking details, personal details and changing transaction details (if the user is using online banking to transfer money).
+
+One of the oldest and most famous MitB Trojan is ZeuS \cite{noauthor_zeus_2010}, also known as Zbot. First discovered in 2006, it has caused vast amount of financial damages. Its creator reportedly retired in 2010 and released \cite{noauthor_zeus_2011} its source code to ZeuS' competitor, SpyEye \cite{noauthor_trojan.spyeye_nodate}.
+
+Despite improvements in browser and OS security, criminals are finding
+creative ways in penetrating user systems in order to commit malicious
+activities.
+
+Mobile phones are not safe either. A variant of ZeuS known as Zitmo \cite{etaher_zeus_2015} or The-Zeus-in-the-Mobile targets mobile phone
+devices.
+
+Form grabbing is a type of MitB that has one focus: to skim and steal
+contents of forms that the user is filling out. Form grabbers are often
+malicious JavaScript code running on compromised websites.
+
+MitB malware is prevalent in the financial sector and payment gateway
+systems. Using this method, the attackers maximise their financial gain.
+A notable example of MitB---in the form of form grabbing--- is the
+British Airways' incident: the attackers were able to manipulate a
+third-party JavaScript running on British Airways' payment page. This
+manipulation allowed them to scrape payment data as they were entered on
+the site by British Airways' customers \cite{klijnsma_british_2018}.
+
+\textbf{\textsc{Password Spraying Attack.}}
+
+%   \begin{figure}[H]
+%           \centering
+%           \textbf{Authentication with explicit link to deeID}
+%           \begin{sequencediagram}
+%               \centering
+%               \newinst[1]{A}{User}
+%               \newinst[1]{B}{Client}
+%               \newinst[1]{C}{Server}
+%               \newinst[1]{D}{Attacker}
+%               \mess{D}{Infect JS Skimmer}{C}
+%               \mess{B}{GET /payment}{C}
+%               \mess{C}{Respond /payment}{B}
+%               \mess{A}{Type payment data $= d$}{B}
+%               \mess{A}{Press Submit}{B}
+%               \mess{B}{POST /m, body $= d$}{D}
+%               \mess{B}{POST /payment, body $= d$}{C}
+%           \end{sequencediagram}
+%           \label{seq:basicmitb}
+%           \caption{Sequence of a basic MitB Skimmer.}
+%       \end{figure}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Clickjacking or UI Redress Attack}: This is a deceptive technique where a
+  malicious website or attacker tricks a user into clicking on something
+  different from what they perceive. It is typically done by overlaying
+  transparent elements on a legitimate webpage, making users perform
+  unintended actions without their knowledge.
+\item
+  \textbf{Cross Frame Scripting (XFS)}:  This is an attack that combines malicious JavaScript with an iframe that loads a legitimate page in an effort to steal data from an unsuspecting user. This attack is usually only successful when combined with social engineering. An example would consist of an attacker convincing the user to navigate to a web page the attacker controls. The attacker’s page then loads malicious JavaScript and an HTML iframe pointing to a legitimate site. Once the user enters credentials into the legitimate site within the iframe, the malicious JavaScript steals the keystrokes.
+\item
+  \textbf{Cross Site History Manipulation (XSHM)}: XSHM is an attack
+  that manipulates the browser's history to change the URLs visited by a
+  user. This can lead to confusing and potentially harmful navigation,
+  exploiting the same-origin policy of web browsers.
+\item
+  \textbf{Cross Site Tracing}: Cross Site Tracing is an attack that
+  takes advantage of HTTP TRACE requests to steal sensitive information,
+  often through cross-site scripting or other vulnerabilities. It can
+  expose cookies or credentials to attackers.
+\item
+  \textbf{Mobile code invoking untrusted mobile code}: This refers to
+  situations where mobile code (code executed on a mobile device, like a
+  smartphone) invokes other untrusted code, which could potentially lead
+  to security risks. It's a concern in the context of mobile app
+  development.
+\item
+  \textbf{Mobile code non-final public field}: This relates to the
+  exposure of non-final public fields in mobile code, which can be
+  manipulated or tampered with by external parties, potentially leading
+  to security vulnerabilities.
+\item
+  \textbf{Mobile code object hijack}: In this attack, malicious mobile
+  code can hijack or take control of objects or resources in a mobile
+  environment, potentially leading to unauthorized access or
+  manipulation.
+\item
+  \textbf{Qrljacking}: Qrljacking is a type of attack where an attacker
+  tricks users into scanning a QR code that leads to a malicious website
+  or action, rather than the intended destination.
+\item
+  \textbf{Reflected DOM Injection}: Reflected DOM Injection is a type of
+  cross-site scripting (XSS) attack where the injected script
+  manipulates the Document Object Model (DOM) of a web page. This can
+  lead to various security issues and data theft.
+\item
+  \textbf{Reverse Tabnabbing}: Reverse Tabnabbing is a variant of
+  phishing that occurs when a malicious website changes the content of a
+  previously opened tab or window, making it appear legitimate while
+  tricking the user into revealing sensitive information.
+\item
+  \textbf{Cross-Site Scripting (XSS)}: XSS is a widespread attack where
+  an attacker injects malicious scripts into web content that is then
+  executed by unsuspecting users. It can result in data theft, session
+  hijacking, or defacement of websites. It can occur in various
+  contexts, including in subtitles, if not properly sanitized.
+\item
+  \textbf{Cross Site Request Forgery (CSRF)}: CSRF is an attack where an
+  attacker tricks a user into unknowingly making an unwanted request to
+  a different website on which the user is authenticated, potentially
+  causing unauthorized actions.
+\item
+  \textbf{Drive-By Downloads}: Drive-By Downloads are attacks that
+  automatically download and install malicious software onto a user's
+  device when they visit a compromised or malicious website, often
+  without their consent.
+\item
+  \textbf{Browser Fingerprinting}: Browser fingerprinting is a technique
+  used to collect unique information about a user's web browser and
+  device. This information can be used to track users without their
+  knowledge, compromising privacy.
+\item
+  \textbf{Content Spoofing - Form Spoofing}: Content spoofing,
+  particularly form spoofing, involves manipulating the content of web
+  forms to deceive users into providing sensitive information to a
+  malicious website or attacker.
+\item
+  \textbf{Malvertising}: Malvertising involves delivering malicious
+  software or content through online advertisements. Users may
+  unknowingly encounter malware by clicking on these ads.
+\item
+  \textbf{Session Fixation}: Session fixation is an attack where an
+  attacker sets or fixes a user's session identifier, potentially
+  allowing them to impersonate the victim after login.
+\item
+  \textbf{Malicious Browser Extensions}: Malicious browser extensions
+  are browser add-ons or plugins that appear harmless but can steal
+  data, inject ads, or compromise user privacy.
+\end{enumerate}
+
+%TODO: Server side attacks
+%\input{chapters/background/__server_side_attacks}

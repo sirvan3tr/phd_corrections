@@ -1,0 +1,49 @@
+\section{Discussion}
+Password Composition Policy is a culmination of our understanding of password security, it takes into account password complexity (or strength), password guessing algorithms, and user behaviour. Whilst many policies exist such as minimum number of characters, the NCSC recommendation of three random words is the only one that proposes a \textit{structure} policy. This paper has then analysed this policy and its necessity. We find that a structure-based policy in addition to other existing policies does improve password strength.
+
+The \pwdninja dataset showed that the expected complexity of password structures that are unrestricted (i.e. no recommendation or policy) is weak. In order for a system or web admin to increase the expected complexity of their dataset then they can recommend their users to adopt complex password structures, such as multiple words.
+
+Using a theoretical model we show that in practice a user would need 4 to 5 words to mitigate the lack of randomness in choosing a word. Our recommendation is then a five word password structure policy to offset non-uniform word selection.
+
+\subsection{Ethical Considerations}
+In handling sensitive password data, we enforce strict ethical safeguards. We limit our analysis to the well-established SecLists datasets~\cite{miessler_danielmiesslerseclists_2024}, which researchers have extensively used in prior password-guessing literature. This choice allows us to:
+\begin{itemize}
+\item Avoid releasing any new compromised data.
+\item Ensure complete removal of personally identifiable information (PII)---No PII is processed or stored.
+\item Build upon an established ethical framework in password research. The datasets used in this study have been regularly used and vetted in prior research.
+\end{itemize}
+
+\subsection{Limitations}
+The \pwdninja~\cite{almasi2024passwordninja}, while valuable, represents a specific snapshot in time (2009-2015) and primarily includes English and Spanish-language passwords. This could limit the generalisability of our findings. However, even between 2009 and 2015, there were insignificant differences in the characteristics of the data. This leads us to believe that patterns observed in the older datasets would also be present in more recent ones.
+
+The evaluation of our theoretical model could, in the future, account for semantic relationships between instances of elements. Although we accounted for this in our model, we did not consider these semantic relationships in the final evaluation. Future research could explore how these semantic connections influence the overall system behaviour, particularly in edge cases where traditional evaluation metrics may fall short. However, this limitation does not diminish the significance of our findings. Moreover, the theoretical model could evaluate other types of password structures beyond three words.
+
+Despite these limitations, our findings provide strong evidence supporting the need for adjusted password composition policies that account for real-world user behaviour while maintaining security requirements. The proposed five-word minimum represents a practical enhancement to existing guidelines that balances security needs with human factors in password creation.
+    
+\section{Related Work}
+
+Despite extensive research in password complexity measures and meters, \textbf{recommendations} for password policies remain scarce. Bonk~\etal~\cite{Bonk_Parish_et_al_2021} offer guidance on constructing passphrases, suggesting longer sequences, such as seven words or more. The study found that long passphrases (7+ words) achieved login success rates of 74-86\% with average login times of 25-30 seconds, suggesting reasonable usability for high-security accounts accessed daily. However, the paper mainly focussed on usability. Our recommendation of five words provides a more quantitative reasoning behind its choice. Gerlitz~\etal~\cite{gerlitz_please_2021} provided a comprehensive analysis of password composition policies in Germany.
+
+Early password modelling techniques, such as the Markov $n$-gram model \cite{Narayanan_Shmatikov_2005}, focused on individual characters, positing that \textit{"the distribution of letters in easy-to-remember passwords likely mirrors the letter distribution in the user's native language."} We have validated this hypothesis at the word level. The observation that letter distribution is not uniform holds true for words, exhibiting a power-law distribution akin to Zipf's law. Modelling passwords based on Probabilistic Context-Free Grammars (\pcfg) was the next innovation in password modelling. Our insights into empirical password structures can refine \pcfgnocite modelling. Incorporating $W_n \text{ and } N_n$ as variables for words and names respectively enhances the computational viability of modelling more intricate structures. Subsequent advancements have leveraged machine learning techniques in password modelling, including neural networks \cite{Castro2017ModelingPG}, GANs \cite{Hitaj_Gasti_Ateniese_Perez-Cruz_2019}, RNNs \cite{Melicher_Ur_Segreti_Komanduri_Bauer_Christin_Cranor_2016}, and Transformers~\cite{Xu_Yu_Zhang_Wang_Zhang_Wu_Han_2023}, among others.
+
+Historical analyses of password characteristics have focused on \textit{length}, \textit{count}, and \textit{character-level structures} \cite{Ma_Yang_Luo_Li_2014, Li_Han_Xu_2014, Das_Bonneau_Caesar_Borisov_Wang_2014, ur_et_al_2015, Li_Wang_Sun_2016, pearman_et_al_2017, Pasquini_Cianfriglia_Ateniese_Bernaschi_2021, Cazier_Medlin_2006}.
+
+\zxcvbn employs dictionaries and bespoke rules to gauge password strength on a scale from 0 to 4. However, \zxcvbnnocite has its limitations; for example, it incorrectly parses the password \password{gomythsun} as \texttt{go\;myths\;un}, impacting its strength rating. Additionally, it struggles with transformations like \texttt{numbr} from \texttt{number}. Wang~\etal~\cite{Wang_Shan_Dong_Shen_Jia_2023} delve deeper into evaluating password strength meters. Their endorsement of \zxcvbnnocite and Markov $n$-gram models informed our method.
+
+In an analysis of Chinese passwords~\cite{Li_Han_Xu_2014}, Li~\etal conduct a broad analysis on the syntax of passwords. Our research extends their work by digging deeper into the password structures. For instance, Li \etal identified $LLLLLL$ as the predominant structure within the \fun{Rockyou} dataset, typically representing a word as we showed in our results. Further structural analysis on various password datasets is presented in \cite{Li_Wang_Sun_personal_info_2016}.
+
+Das~\etal~\cite{Das_Bonneau_Caesar_Borisov_Wang_2014} explored password syntax, notably introducing analysis on word or phrase transformations. However, we disagree with their classification of sequential keys, alternate keys, and sequential alphabet as transformations, viewing these more as sequences. Riddle~\etal~\cite{Riddle_Miron_Semo_1989} delve into the composition and semantics of passwords, with an emphasis on the psychological significance of words.
+
+%In "Investigating the Distribution of Password Choices" \cite{Malone_Maher_2012}, the analysis of the \hmail dataset concluded with a distribution resembling Zipf's law. Our analytical efforts advance this observation, demonstrating that extracted words from unique passwords also follow a similar distribution.
+
+\section{Conclusion}
+We have developed a rigorous model that incorporates password structure and empirical user behaviour patterns, filling a critical gap in our understanding of password security. Through analysis of real-world password datasets, we demonstrate that structure-based password policy such as three-words $(w,w,w)$ empirically and theoretically offer security advantages. However, the NCSC's previously recommended three-word password policy, while theoretically sound, fail to account for users' non-uniform word selection which follows a Zipf-like distribution. Our framework provides both theoretical foundations and practical guidelines for developing more robust authentication policies that reflect actual user behaviour rather than theoretical ideals.
+
+We recommend extending the NCSC's password composition policy to require five words, which our models show provides comparable security to the theoretical three-word ideal even under real-world usage patterns. This recommendation maintains usability while providing demonstrably stronger protection. 
+
+Future work includes incorporating \textit{memorability} into our optimisation problem. Memorability represents the cognitive overhead with respect to some password structure. Memorability would capture the expected structure given some policy.
+
+\section*{Acknowledgement}
+The authors would like to thank \textit{Nora A.} for her discussions, generous time, and support.
+
+

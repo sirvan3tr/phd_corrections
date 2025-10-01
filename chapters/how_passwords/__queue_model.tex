@@ -1,0 +1,32 @@
+%\subsection{Queueing Model}
+We model the process using a single server queue. The potential candidates are generated at near deterministic rate $\lambda$ and similarly the passwords are hashed and processed at near deterministic rate $\mu$. Therefore using Kendal's notation, the system is modelled as G/G/1. Let $\lambda(t)$ represent the arrival rate, and let $\mu(t)$ represent the hashing rate (this is typically referred to as the service rate). The utilization of our hashing server $H$ is:
+\begin{equation}
+    \rho = \frac{\lambda}{\mu}
+\end{equation}
+
+The utilization factor $\rho = \frac{\lambda}{\mu}$ must satisfy $\rho < 1$ for system stability, implying that the generation rate cannot exceed the processing capacity of the hashing function. 
+
+\[
+\rho = \lambda \, \mathbb{E}[S]
+\]
+
+The expected wait time in the system (queue and hashing) is given by the Kingman's approximation for our G/G/1 system.
+\begin{equation}
+    \mathbb{E}[W] = \frac{\rho}{1 - \rho} \cdot \frac{c_a^2 - c_s^2}{2} \cdot \mathbb{E}[S]
+\end{equation}
+The expected time in the system for a given password candidate:
+\begin{equation}
+    \mathbb{E}[T] = \mathbb{E}[S] + \mathbb{E}[W]
+\end{equation}
+\begin{equation}
+    \mathbb{E}[T] = \left[ 1 + \frac{\rho}{1 - \rho} \cdot \frac{c_a^2 - c_s^2}{2} \right] \cdot \mathbb{E}[S]
+\end{equation}
+Based on, we can now calculate the expected number of password candidates in the system using Little's law:
+\begin{equation}
+    \mathbb{E}[N] = \lambda \mathbb{E}[T]
+\end{equation}
+\begin{equation}
+    \mathbb{E}[N] = \rho + \frac{\rho^2(c_a^2 - c_s^2)}{2(1 - \rho)}
+\end{equation}
+
+Ideally we would like our server to be operating at maximum capacity, i.e. to maximise the resources available. This implies that our password generation should match the service rate of our server. However, we still want password candidates with high probability of inverting the hash function. So, a better measure of password guessing algorithm would be the expected time to crack--i.e. the expected time for an algorithm to invert the hash function. This takes into consideration the resources available to us and the probability distribution of an algorithm successfully guessing a password.

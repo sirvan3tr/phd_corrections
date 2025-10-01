@@ -1,0 +1,178 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% UHEAD.STY - Enhanced Header Style for LaTeX Report Class
+% 
+% Description: This style file adds underlined heading capabilities to the LaTeX 
+% report class when included after \documentstyle{report}. Use 
+% \pagestyle{uheadings} for underlined headers on each page.
+% - Right page headers show Chapter titles
+% - Left page headers are set via \def\lefthead{text}
+%
+% Original Author: Ted Shapin
+% Original Date: December 17, 1986
+% Modified: [Current Date]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\makeatletter  % Enable @ in command names
+
+%------------------------------------------------------------------------------
+% Chapter and Appendix Definitions
+%------------------------------------------------------------------------------
+\def\chapapp2{Chapter}
+\def\appendix{\par
+    \setcounter{chapter}{0}
+    \setcounter{section}{0}
+    \def\chapapp2{Appendix}
+    \def\@chapapp{Appendix}
+    \def\thechapter{\Alph{chapter}}}
+
+%------------------------------------------------------------------------------
+% Custom Page Style Definition (uheadings)
+%------------------------------------------------------------------------------
+\def\ps@uheadings{\let\@mkboth\markboth
+    % Define odd page header (right pages)
+    \def\@oddhead{\protect\underline{\protect\makebox[\textwidth][l]
+        {\sl\rightmark\hfill\rm\thepage}}}
+    % Clear footers
+    \def\@oddfoot{}
+    \def\@evenfoot{}
+    % Define even page header (left pages)
+    \def\@evenhead{\protect\underline{\protect\makebox[\textwidth][l]
+        {\rm\thepage\hfill\sl\leftmark}}}
+    
+    % Define chapter and section marking
+    \def\chaptermark##1{\markboth {\ifnum \c@secnumdepth >\m@ne
+        \chapapp2\ \thechapter. \ \fi ##1}{}}%
+    \def\sectionmark##1{\markright {\ifnum \c@secnumdepth >\z@
+        \thesection. \ \fi ##1}}}
+
+%------------------------------------------------------------------------------
+% Page Layout Settings
+%------------------------------------------------------------------------------
+\pagestyle{empty}
+\setlength{\parskip}{2ex plus 0.5ex minus 0.2ex}
+\setlength{\parindent}{0pt}
+
+%------------------------------------------------------------------------------
+% Title Page Configuration
+%------------------------------------------------------------------------------
+\usepackage{titlesec}  % Required for custom chapter formatting
+%\usepackage{graphicx}  % Added for \includegraphics support
+
+% Chapter title formatting
+\titleformat{\chapter}[display]
+    {\normalfont\huge\bfseries\centering}
+    {\chaptertitlename\ \thechapter}
+    {20pt}
+    {\Huge}
+
+% Set line spacing
+\linespread{1.5}
+
+% Custom title page commands
+\titleformat{\chapter}[display]
+{\normalfont\huge\bfseries\centering}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\linespread{1.5}
+\def\submitdate#1{\gdef\@submitdate{#1}}
+\def\maketitle{
+  \begin{titlepage}{
+    \includegraphics[scale=0.09]{preface/IMPERIAL_Wordmark_CMYK_Rich_Black_2024.eps}
+    \vskip 0.05in
+    {\large Imperial College London} \\
+    Department of Computing
+    \rm
+    \vskip 3in
+    \huge \bf \@title \par
+  }
+  \vskip 0.2in
+  % {\textit{by}}
+  \par
+  {\Large \@author}
+  %\par
+  \vskip 3.5in
+  \par
+  {Supervised by Prof William J. Knottenbelt}
+  \par
+  Submitted in partial fulfilment of the requirements for the award of \\
+  \textit{Doctor of Philosophy} from Imperial College London, \@submitdate
+  \vfil
+  \end{titlepage}
+}
+\def\titlepage{
+  \newpage
+  \centering
+  \linespread{1}
+  \normalsize
+  \vbox to \vsize\bgroup\vbox to 9in\bgroup
+}
+\def\endtitlepage{
+  \par
+  \kern 0pt
+  \egroup
+  \vss
+  \egroup
+  \cleardoublepage
+}
+
+%------------------------------------------------------------------------------
+% Document Sections Configuration
+%------------------------------------------------------------------------------
+% Abstract environment
+\def\abstract{
+    \begin{center}
+        {\large\bf Abstract}
+    \end{center}
+    \small
+    \linespread{1.5}
+    \normalsize
+}
+\def\endabstract{\par}
+
+% Acknowledgements environment
+\newenvironment{acknowledgements}{
+    \cleardoublepage
+    \begin{center}
+        {\large \bf Acknowledgements}
+    \end{center}
+    \small
+    \linespread{1.5}
+    \normalsize
+}{\cleardoublepage}
+
+% Dedication environment
+\newenvironment{dedication}{
+    \cleardoublepage
+    \begin{center}
+        {\large \bf Dedication}
+    \end{center}
+    \small
+    \linespread{1.5}
+    \normalsize
+}{\cleardoublepage}
+
+% Preface and body formatting
+\def\preface{
+    \pagenumbering{roman}
+    \pagestyle{plain}
+    \doublespacing
+}
+
+\def\body{
+    \cleardoublepage    
+    \pagestyle{uheadings}
+    \tableofcontents
+    \pagestyle{plain}
+    \cleardoublepage
+    \pagestyle{uheadings}
+    \listoftables
+    \pagestyle{plain}
+    \cleardoublepage
+    \pagestyle{uheadings}
+    \listoffigures
+    \pagestyle{plain}
+    \cleardoublepage
+    \pagestyle{uheadings}
+    \pagenumbering{arabic}
+    \doublespacing
+}
+
+\makeatother  % Restore @ to its normal category code

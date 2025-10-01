@@ -1,0 +1,451 @@
+\usepackage{float} % Improved interface for floating objects
+\usepackage[greek,english]{babel}
+\usepackage{ragged2e} % For text justification
+% minitoc breaks the IEEEtran cls
+% \usepackage{minitoc} % Allows you to include contents page in chapters if you want
+\usepackage[table]{xcolor} % Advanced color handling with table option for coloring tables
+\usepackage[backend=biber,
+            style=ieee,
+            sorting=nyt, %maxbibnames=99,
+            doi=true,
+            url=true,
+            giveninits=true]{biblatex}
+\usepackage{amsmath,amssymb,amsfonts} % AMS mathematical facilities and symbols
+\usepackage{bm} % Access bold math symbols
+\usepackage{graphicx} % Enhanced support for graphics
+\usepackage{textcomp} % Additional text symbols
+\usepackage{hyperref} % Extensive support for hypertext in LaTeX
+\usepackage{tikz} % Creation of diagrams and pictures using PGF
+\usetikzlibrary{positioning, shapes.multipart, arrows.meta}
+\usepackage{mathdots} % Commands to produce dots in math that respect font size
+\usepackage{yhmath} % Extended maths fonts for LaTeX
+\usepackage{cancel} % Place lines through maths formulae
+\usepackage{siunitx} % A comprehensive (SI) units package
+\usepackage{array} % Extending the array and tabular environments
+\usepackage{multirow} % Create tabular cells spanning multiple rows
+\usepackage{gensymb} % Generic symbols for both text and math mode
+\usepackage{tabularx} % Tabulars with adjustable-width columns
+\usepackage{xurl} % Allow URL breaks at any alphanumerical character
+\usepackage{listings} % Typeset source code listings using LaTeX
+\usepackage{minted} % Highlighted source code for LaTeX
+\usepackage{pgf} % Create PostScript and PDF graphics
+\usepackage{pgf-pie} % Draw pie charts, part of the pgf bundle
+\usepackage{tikz-cd} % Create commutative diagrams with TikZ
+\usepackage[en-US]{datetime2} % Formats for dates, times and time zones
+\usepackage{pgfplotstable} % Loads, rounds, formats and postprocesses numerical tables
+\usepackage{booktabs} % Publication quality tables in LaTeX
+\usepackage{pgfplots} % Create normal/logarithmic plots in two and three dimensions
+\usepackage{arydshln} % Dash-Lined hline and vline in array and tabular
+\usepackage[most]{tcolorbox} % Colored boxes, for LaTeX examples and theorems, etc.
+\usepackage{pgf-umlsd} % Draw UML Sequence Diagrams
+\usepackage{enumitem} % Modify the spacing between items
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{fbox}
+\usepackage{setspace}
+\usepackage{pifont} % For \ding{} symbols
+\usepackage{ifthen}
+%\usepackage{worldflags}
+\usepackage{pst-flags}
+\usepackage[expansion=true, kerning=true]{microtype} % widows
+
+%\newsavebox{\USflagbox}
+%\sbox{\USflagbox}{\worldflag[width=2mm]{US}}
+
+% Define the 'definition' environment
+%\newtheorem{definition}{Definition}[section]
+
+\newtcbtheorem[number within=section]{theorem}{Theorem}{%
+    enhanced,
+    colback=gray!5,  % Light grey background
+    colframe=gray!40, % Darker grey frame
+    arc=4mm,         % Rounded corners
+    boxrule=1pt,     % Frame thickness
+    fonttitle=\bfseries,
+    separator sign={.}
+}{th}
+
+%-----------------------------------------------------------------------------------------------
+% Theorem style
+\usepackage[ntheorem]{mdframed}
+\mdfsetup{%
+topline=false,
+rightline=false,
+bottomline=false,
+linewidth=3pt,
+innerleftmargin=15pt,
+innerrightmargin=0pt,
+skipabove=\baselineskip,
+skipabove=1.2\baselineskip,
+}
+
+\newtheorem{mdbeispiel}{Beispiel}[section]
+\newtheorem{mdspiele}{Theorem}[section]
+\newenvironment{beispiel}[1][]%
+   {\begin{mdframed}[linecolor=blue]\begin{mdbeispiel}[#1]}
+   {\end{mdbeispiel}\end{mdframed}}
+\newenvironment{Theorem}[1][]%
+   {\begin{mdframed}[linecolor=yellow]\begin{mdspiele}[#1]}
+   {\end{mdspiele}\end{mdframed}}
+
+\newtheorem{conj}{Conjecture}[section]
+\newenvironment{conjecture}[1][]%
+   {\begin{mdframed}[linecolor=red]\begin{conj}[#1]}
+   {\end{conj}\end{mdframed}}
+   
+\newtheorem{mddef}{Definition}[section]
+\newenvironment{definition}[1][]%
+   {\begin{mdframed}[linecolor=lightgray]\begin{mddef}[#1]}
+   {\end{mddef}\end{mdframed}}
+
+   
+%-----------------------------------------------------------------------------------------------
+
+% Define theorem-like environments
+% \theoremstyle{plain}
+% \newtheorem{theorem}{Theorem}[section]
+% \newtheorem{lemma}[theorem]{Lemma}
+% \newtheorem{proposition}[theorem]{Proposition}
+% \newtheorem{corollary}[theorem]{Corollary}
+
+% \theoremstyle{definition}
+% \newtheorem{definition}[theorem]{Definition}
+% \newtheorem{axiom}[theorem]{Axiom}
+% \newtheorem{example}[theorem]{Example}
+% 
+% \theoremstyle{remark}
+% \newtheorem{remark}[theorem]{Remark}
+% \newtheorem{note}[theorem]{Note}
+
+%-----------------------------------------------------------------------------------------------
+%   Algorithms
+
+%%  Confusing state of the algorithm packages:
+%%  algorithm - float wrapper for algorithms.
+%%  algorithmic - first algorithm typesetting environment.
+%%  algorithmicx - second algorithm typesetting environment.
+%%  algpseudocode - layout for algorithmicx.
+%%  algorithm2e - third algorithm typesetting environment.
+
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+\DontPrintSemicolon
+%-----------------------------------------------------------------------------------------------
+
+%   Font-sizes
+
+%   \tiny
+%   \scriptsize
+%   \footnotesize
+%   \small
+%   \normalsize	F-normalsize.png
+%   \large	F-large.png
+%   \Large	F-large2.png
+%   \LARGE	F-large3.png
+%   \huge	F-huge.png
+%   \Huge	F-huge2.png
+
+%-----------------------------------------------------------------------------------------------
+%   Define pseudocode formatting
+\renewcommand{\KwSty}[1]{\textnormal{\textcolor{blue!90!black}{\ttfamily\bfseries #1}}\unskip}
+\renewcommand{\ArgSty}[1]{\textnormal{\ttfamily #1}\unskip}
+\SetKwComment{Comment}{\color{green!50!black}// }{}
+\renewcommand{\CommentSty}[1]{\textnormal{\ttfamily\color{green!50!black}#1}\unskip}
+\newcommand{\assign}{\leftarrow}
+\newcommand{\var}{\texttt}
+\newcommand{\FuncCall}[2]{\texttt{\bfseries #1(#2)}}
+\SetKwProg{Function}{function}{}{}
+\renewcommand{\ProgSty}[1]{\texttt{\bfseries #1}}
+
+%\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+%    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\lstset{basicstyle=\ttfamily, keywordstyle=\bfseries}
+%-----------------------------------------------------------------------------------------------
+\pgfplotsset{compat=1.18}
+%-----------------------------------------------------------------------------------------------
+%   Colors
+\definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
+\definecolor{mylilas}{RGB}{170,55,241}
+\definecolor{lightgreen}{HTML}{A1EEBD}
+\definecolor{darkgreen}{HTML}{3f6e50}
+\definecolor{pieone}{HTML}{FAE5D3}%light color
+\definecolor{pietwo}{HTML}{A04000}
+\definecolor{xLightGreen}{HTML}{A1EEBD}
+\definecolor{xLightYellow}{HTML}{F6F7C4}
+\definecolor{xLightRed}{HTML}{F6D6D6}
+\definecolor{xLightBlue}{HTML}{7BD3EA}
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+
+% h Place the float here, i.e., approximately at the same point it occurs in the source text (however, not exactly at the spot)
+% t Position at the top of the page.
+% b Position at the bottom of the page.
+% p Put on a special page for floats only.
+% ! Override internal parameters LaTeX uses for determining "good" float positions.
+% H Places the float at precisely the location in the LATEX code. Requires the float package. This is somewhat equivalent to h!.
+% 
+
+\newcommand{\DrawPercentageBar}[1]{%
+  \begin{tikzpicture}
+    \fill[color=black]   (0.0 , 0.0) rectangle (#1*7ex , 1.75ex );
+    \fill[color=gray] (#1*7ex  , 0.0) rectangle (7.0ex, 1.75ex);
+  \end{tikzpicture}%
+}
+
+\newcommand{\DrawLengthBar}[1]{%
+  \begin{tikzpicture}
+    \fill[color=lightgreen]   (0.0 , 0.0) rectangle (#1*0.8ex , 1.75ex );
+  \end{tikzpicture}%
+}
+
+\newcommand{\DrawLengthBarThick}[1]{%
+  \begin{tikzpicture}
+    \fill[color=lightgreen]   (0.0 , 0.0) rectangle (#1*0.8ex , 2ex );
+  \end{tikzpicture}%
+}
+\renewcommand\tabularxcolumn[1]{m{#1}}% for vertical centering text in X column
+
+\newcommand{\DrawSmallPieChart}[1]{%
+    \begin{tikzpicture}[draw opacity=0]
+        \node at (3.8ex,-0.0ex) { \textcolor{darkgreen}{\footnotesize #1 } };
+        \pie[scale=0.055, color={darkgreen, lightgreen}, before number=\phantom, after number=,
+        style =very thin,
+        /tikz/nodes={opacity=0,overlay}% <-
+]{#1/, 100-#1/}
+    \end{tikzpicture}
+}
+
+\newcommand{\Password}[1]{%
+  \begin{tikzpicture}
+    \small
+    \node[draw, rectangle, rounded corners=4pt, inner sep=3pt] {\texttt{#1}};
+  \end{tikzpicture}%
+}
+
+\usetikzlibrary{fadings}
+\usetikzlibrary{patterns}
+\usetikzlibrary{shadows.blur}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+% Requires arydshln package
+\setlength\dashlinedash{0.2pt}
+\setlength\dashlinegap{2pt}
+\setlength\arrayrulewidth{0.1pt}
+%-----------------------------------------------------------------------------------------------
+%% Maths stuff
+\DeclareMathOperator*{\di}{\mathrm{d}\!}
+\def\at{
+  \left.
+  \vphantom{\int}
+  \right|
+}
+
+
+
+%-----------------------------------------------------------------------------------------------
+%% Grey note box with red heading
+\newcommand{\noteBox}[3][16cm]{%
+    \begin{center}
+    \begin{tikzpicture}
+    \def\gridwidth{#1}% Optional width parameter (default 16cm)
+    \node[draw=gray!30, fill=gray!3, text width=\gridwidth-20pt, 
+          inner sep=10pt, rounded corners=2pt] (box) {
+        \begin{minipage}{\linewidth}
+        \centering
+        \normalsize\textbf{\textcolor{purple}{#2}}% Title parameter
+        
+        \vspace{0.5em}
+        \normalsize\setstretch{1.2}\justifying
+        #3% Content parameter
+        \end{minipage}
+    };
+    \end{tikzpicture}
+    \end{center}
+}
+
+
+
+\newcommand{\noteBoxNormal}[3][16cm]{%
+    \begin{center}
+    \begin{tikzpicture}
+    \def\gridwidth{#1}% Optional width parameter (default 16cm)
+    \node[draw=gray!30, fill=gray!3, text width=\gridwidth-20pt, 
+          inner sep=10pt, rounded corners=2pt] (box) {
+        \begin{minipage}{\linewidth}
+        \centering
+        \textbf{\textcolor{purple}{#2}}% Title parameter
+        
+        \vspace{0.5em}
+        \normalsize\justifying
+        #3% Content parameter
+        \end{minipage}
+    };
+    \end{tikzpicture}
+    \end{center}
+}
+
+\newcommand{\noteBoxGrey}[3][\textwidth-20pt]{%
+    \begin{center}
+    \begin{tikzpicture}
+    \def\gridwidth{#1}% Optional width parameter (default 16cm)
+    \node[fill=gray!10, text width=\gridwidth-20pt, 
+          inner sep=20pt, rounded corners=4pt] (box) {
+        \begin{minipage}{\linewidth}
+        \centering
+        \large\textbf{\textcolor{purple}{#2}}% Title parameter
+
+        \vspace{0.5em}
+        \small\setstretch{1}\justifying
+        #3% Content parameter
+        \end{minipage}
+    };
+    \end{tikzpicture}
+    \end{center}
+}
+
+\newcommand{\bibBox}[3][\textwidth-20pt]{%
+    \begin{center}
+    \begin{tikzpicture}
+    \def\gridwidth{#1}% Optional width parameter (default 16cm)
+    \node[fill=gray!10, text width=\gridwidth-20pt, 
+          inner sep=5pt, rounded corners=4pt] (box) {
+        \begin{minipage}{\linewidth}
+        \centering
+        \small\textbf{\textcolor{purple}{#2}}% Title parameter
+        \hspace{0.2cm}
+        \small\setstretch{1}\justifying
+        #3% Content parameter
+        \end{minipage}
+    };
+    \end{tikzpicture}
+    \end{center}
+}
+
+
+
+%-----------------------------------------------------------------------------------------------
+% Fancy text, e.g. password in a rounded rectangle and a diff colour
+\newcommand{\password}[2][violet!30]{%
+  \tikz[baseline=(textnode.base)]{
+    \node[
+      draw=#1,             % Outline color (default: black)
+      text=violet,
+      rounded corners=3.5pt, % Corner radius
+      thin,                % Outline thickness
+      inner sep=2pt,       % Padding between text and rectangle
+      anchor=base          % Aligns with baseline
+    ] (textnode) {\texttt{#2}};
+  }%
+}
+
+
+\newcommand{\guessmodel}[2][deepblue!10]{%
+  \tikz[baseline=(textnode.base)]{
+    \node[
+      draw=#1,             % Outline color (default: black)
+      text=deepblue,
+      rounded corners=3.5pt, % Corner radius
+      thin,                % Outline thickness
+      inner sep=2pt,       % Padding between text and rectangle
+      anchor=base          % Aligns with baseline
+    ] (textnode) {\texttt{#2}};
+  }%
+}
+
+% Create a san-serif style in math mode
+\newcommand{\fun}[1]{\ensuremath{\mathsf{#1}}}
+\newcommand{\srcOwnFig}{Source: Own figure.\xspace}  % Shortcut for own figure.
+\newcommand{\etal}{\textit{et al.}\xspace}
+\newcommand{\passwordNinjaURL}{\url{https://github.com/sirvan3tr/passwordninja}\xspace}
+%-----------------------------------------------------------------------------------------------
+%% Thesis specific
+\newcommand{\hmail}{\fun{hotmail}\xspace}
+\newcommand{\phpbb}{\fun{phpbb}\xspace}
+\newcommand{\lizardsquad}{\fun{LizardSquad}\,\cite{miessler_lizardsquad_2015}\xspace}
+
+\newcommand{\lizardsquadnocite}{\fun{LizardSquad}\xspace}
+\newcommand{\pwdninja}{\fun{passwordNinja}\xspace}
+
+\newcommand{\hashcat}{Hashcat~\cite{steube_hashcat_2023}\xspace}
+\newcommand{\jtr}{JtR~\cite{JtR}\xspace}
+
+\newcommand{\markovngram}{\guessmodel{Markov $n$-gram}~\cite{narayanan_fast_2005}\xspace}
+\newcommand{\pcfg}{\guessmodel{PCFG}~\cite{weir_password_2009}\xspace}
+\newcommand{\zxcvbn}{\guessmodel{zxcvbn}~\cite{zxcvbn2016}\xspace}
+\newcommand{\passgan}{\guessmodel{PassGAN}~\cite{hitaj_passgan_2019}\xspace}
+\newcommand{\cwaecpg}{\guessmodel{CWAE-CPG}~\cite{pasquini_improving_2021}\xspace}
+\newcommand{\cwaegan}{\guessmodel{CWAE-GAN}~\cite{pasquini_improving_2021}\xspace}
+\newcommand{\omen}{\guessmodel{OMEN}~\cite{durmuth_omen_2015}\xspace}
+\newcommand{\omecdn}{\guessmodel{OMECDN}~\cite{jiang_omecdn_2022}\xspace}
+\newcommand{\rfguess}{\guessmodel{RFGuess}~\cite{wang_password_2023}\xspace}
+\newcommand{\gnpassgan}{\guessmodel{GNPassGAN}~\cite{yu_gnpassgan_2022}\xspace}
+\newcommand{\adams}{\guessmodel{AdaMs}~\cite{pasquini_reducing_2021}\xspace}
+\newcommand{\fla}{\guessmodel{FLA}~\cite{melicher_fast_2016}\xspace}
+\newcommand{\gpass}{\guessmodel{G-Pass}~\cite{zhou_password_2022}\xspace}
+\newcommand{\redpack}{\guessmodel{REDPACK}~\cite{redpackgan2020}\xspace}
+\newcommand{\wordpcfg}{\guessmodel{WordPCFG}~\cite{wordpcfg_2021}\xspace}
+\newcommand{\passtcn}{\guessmodel{PassTCN-PPLL}~\cite{passtcn_ppll_2022}\xspace}
+\newcommand{\personalpcfg}{\guessmodel{Personal-PCFG}~\cite{li_study_2016}\xspace}
+\newcommand{\passbert}{\guessmodel{PassBERT}~\cite{xu_improving_2023}\xspace}
+
+\newcommand{\markovngramnocite}{\guessmodel{Markov $n$-gram}}
+\newcommand{\pcfgnocite}{\guessmodel{PCFG}}
+\newcommand{\zxcvbnnocite}{\guessmodel{zxcvbn}}
+\newcommand{\passgannocite}{\guessmodel{PassGAN}}
+\newcommand{\cwaecpgnocite}{\guessmodel{CWAE-CPG}}
+\newcommand{\cwaegannocite}{\guessmodel{CWAE-GAN}}
+\newcommand{\omennocite}{\guessmodel{OMEN}}
+\newcommand{\omecdnnocite}{\guessmodel{OMECDN}}
+\newcommand{\rfguessnocite}{\guessmodel{RFGuess}}
+\newcommand{\gnpassgannocite}{\guessmodel{GNPassGAN}}
+\newcommand{\adamsnocite}{\guessmodel{AdaMs}}
+\newcommand{\flanocite}{\guessmodel{FLA}}
+\newcommand{\gpassnocite}{\guessmodel{G-Pass}}
+\newcommand{\redpacknocite}{\guessmodel{REDPACK}}
+\newcommand{\wordpcfgnocite}{\guessmodel{WordPCFG}}
+\newcommand{\passtcnnocite}{\guessmodel{PassTCN-PPLL}}
+\newcommand{\personalpcfgnocite}{\guessmodel{Personal-PCFG}}
+\newcommand{\passbertnocite}{\guessmodel{PassBERT}\xspace}
+
+\newcommand{\deeid}{\fun{deeID}\xspace}
+\newcommand{\formless}{\fun{FormL3SS}\xspace}
+
+
+%-----------------------------------------------------------------------------------------------
+%% Key derivation functions
+\newcommand{\bcrypt}{\texttt{Bcrypt}~\cite{provos_future-adaptable_1999}}
+\newcommand{\pbkdf}{\texttt{PBKDF2}~\cite{kaliski_pkcs_2000}}
+\newcommand{\spkdf}{\texttt{SP800-108}~\cite{chen_recommendation_2009}}
+\newcommand{\scrypt}{\texttt{Scrypt}~\cite{percival_stronger_2009}}
+\newcommand{\hkdf}{\texttt{HKDF}~\cite{krawczyk_hmac-based_2010}}
+\newcommand{\sakke}{\texttt{SAKKE}~\cite{groves_sakke_2012}}
+\newcommand{\catena}{\texttt{Catena}~\cite{forler_catena_2013}}
+\newcommand{\sphinx}{\texttt{SPHINX}~\cite{sphinx_2015}}
+\newcommand{\makwa}{\texttt{Makwa}~\cite{pornin_makwa_2015}}
+\newcommand{\yescrypt}{\texttt{yescrypt}~\cite{neves_yescrypt_2015}}
+\newcommand{\argontwo}{\texttt{Argon2}~\cite{biryukov_argon2_2016}}
+\newcommand{\balloon}{\texttt{Balloon}~\cite{boneh_balloon_2016}}
+\newcommand{\lyratwo}{\texttt{Lyra2}~\cite{andrade_lyra2_2016}}
+\newcommand{\mixkey}{\texttt{MixKey}~\cite{perrin_mixkey_2017}}
+
+%% Company names
+\newcommand{\ha}{Hanna\;Andersson\xspace}
+
+% Define colors
+\definecolor{lightgray}{RGB}{245,245,245}
+\definecolor{midgray}{RGB}{225,225,225}
+\definecolor{recommend}{RGB}{144,238,144}
+\definecolor{discourage}{RGB}{255,182,193}
+
+% Custom symbols for recommendations
+\newcommand{\recommended}{\textcolor{green}{\faCheckCircle}}
+\newcommand{\discouraged}{\textcolor{red}{\faTimesCircle}}
+\newcommand{\optional}{\textcolor{orange}{\faQuestionCircle}}
+\newcommand{\required}{\textcolor{blue}{\faExclamationCircle}}
+\newcommand{\secure}{\textcolor{green}{\faLock}}
+\newcommand{\manager}{\faKey}
+\newcommand{\mfa}{\faMobileAlt}
+
+\usepackage{csquotes} % load it at the end to stop other packagings complaining

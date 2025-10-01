@@ -1,0 +1,156 @@
+\subsection{Dataset Complexity}
+
+To maximize the complexity of the entire password dataset by considering the distribution of password structures, we can formulate an optimization problem that balances the diversity of structures with the entropy contributed by each structure. Below is a theoretical mathematical framework to address this scenario.
+
+\subsubsection{Definitions and Notations}
+
+\paragraph{Password Structure} Let \( \mathcal{S} = \{ S_1, S_2, \dots, S_m \} \) be the set of all possible password structures, where each structure \( S_j \) is a sequence of elements from the alphabet \( \Sigma \). For example, \( S_j = (w, w, d) \) represents a structure with two words followed by a digit.
+
+\paragraph{Probability of a Structure} Let \( P(S_j) \) denote the probability of selecting structure \( S_j \) in the password dataset. Thus, the structure probabilities satisfy:
+  \[
+  \sum_{j=1}^{m} P(S_j) = 1
+  \]
+
+\paragraph{Elements within Structures} For a given structure \( S_j = (e_1, e_2, \dots, e_k) \), each element \( e_i \in \Sigma \) has an associated probability \( P(e_i \mid S_j) \).
+
+\subsubsection{Password Probability Distribution}
+
+The probability of a password \( p \) with structure \( S_j \) is given by:
+\[
+P(p) = P(S_j) \prod_{i=1}^{k} P(e_i \mid S_j)
+\]
+where \( p = (e_1, e_2, \dots, e_k) \).
+
+\subsubsection{Entropy of the Password Dataset}
+
+The entropy \( H \) of the entire password dataset, which measures its complexity, is defined as:
+\[
+H = - \sum_{j=1}^{m} P(S_j) \sum_{p \in S_j} P(p) \log P(p)
+\]
+Expanding \( P(p) \):
+\begin{multline}
+H = - \sum_{j=1}^{m} P(S_j) \sum_{p \in S_j} \left( P(S_j) \prod_{i=1}^{k} P(e_i \mid S_j) \right) \\ \log \left( P(S_j) \prod_{i=1}^{k} P(e_i \mid S_j) \right)
+\end{multline}
+Simplifying:
+\[
+H = - \sum_{j=1}^{m} P(S_j) \left[ \log P(S_j) + \sum_{i=1}^{k} \mathbb{E}_{e_i \mid S_j} [\log P(e_i \mid S_j)] \right]
+\]
+\[
+H = - \sum_{j=1}^{m} P(S_j) \log P(S_j) - \sum_{j=1}^{m} P(S_j) \sum_{i=1}^{k} \mathbb{E}_{e_i \mid S_j} [\log P(e_i \mid S_j)]
+\]
+This can be expressed as:
+\begin{equation}
+H = H(\mathcal{S}) + \sum_{j=1}^{m} P(S_j) H(\mathcal{E} \mid S_j)
+\end{equation}
+where:
+
+ \( H(\mathcal{S}) = - \sum_{j=1}^{m} P(S_j) \log P(S_j) \) is the entropy of the structure distribution.
+ 
+\( H(\mathcal{E} \mid S_j) = - \sum_{i=1}^{k} \mathbb{E}_{e_i \mid S_j} [\log P(e_i \mid S_j)] \) is the conditional entropy of the elements given the structure \( S_j \).
+
+\subsubsection{Optimization Objective}
+
+To maximize the complexity \( H \) of the entire password dataset, we aim to maximize both the entropy of the structure distribution and the conditional entropy of elements within each structure. The optimization problem can be formulated as:
+\begin{equation}
+\max_{ \{ P(S_j), P(e_i \mid S_j) \} } H = H(\mathcal{S}) + \sum_{j=1}^{m} P(S_j) H(\mathcal{E} \mid S_j)
+\end{equation}
+
+**Subject to:**
+1. **Probability Constraints:**
+   \[
+   \sum_{j=1}^{m} P(S_j) = 1
+   \]
+   \[
+   \sum_{e_i \in S_j} P(e_i \mid S_j) = 1 \quad \forall j = 1, 2, \dots, m
+   \]
+
+2. **Structural Constraints:**
+   - **Complexity Requirements:** Enforce minimum complexity for certain structures, e.g., ensuring that structures chosen have a minimal number of elements.
+   - **Semantic Constraints:** Limit or regulate semantic relationships to avoid overly predictable patterns.
+
+\subsubsection{Implications of Fixed vs. Random Structures}
+
+\paragraph{Fixed Structure (e.g., \( S^* = (w, w, w) \))}
+
+  If all users adopt a fixed structure \( S^* \), the structure entropy \( H(\mathcal{S}) \) becomes zero since \( P(S^*) = 1 \) and \( P(S_j) = 0 \) for \( j \neq * \). The overall entropy simplifies to:
+  \[
+  H = H(\mathcal{E} \mid S^*)
+  \]
+  This restricts complexity to the variability within the fixed structure, potentially limiting overall entropy.
+
+\paragraph{Randomized Structures}
+
+  Allowing multiple structures to be used with varying probabilities increases \( H(\mathcal{S}) \), thereby contributing to higher overall entropy. However, if structures vary randomly without enforcing complexity, many users might still choose less complex structures, resulting in lower \( H(\mathcal{E} \mid S_j) \) for those structures.
+
+\subsubsection{Balancing Structure Distribution for Maximum Complexity}
+
+To maximize \( H \), we need to optimally distribute \( P(S_j) \) across different structures, favouring structures that contribute higher conditional entropy \( H(\mathcal{E} \mid S_j) \). This can be formalized as:
+
+\[
+\max_{ \{ P(S_j) \} } H = - \sum_{j=1}^{m} P(S_j) \log P(S_j) + \sum_{j=1}^{m} P(S_j) H(\mathcal{E} \mid S_j)
+\]
+
+**Subject to:**
+\[
+\sum_{j=1}^{m} P(S_j) = 1
+\]
+\[
+P(S_j) \geq 0 \quad \forall j
+\]
+
+This optimization encourages a diverse set of structures, each contributing positively to the overall entropy.
+
+\subsubsection{Strategic Structure Allocation}
+
+To ensure that the password dataset achieves high complexity, allocate higher probabilities to structures that inherently provide higher conditional entropy. For example:
+
+- **High-Complexity Structures:** Structures with diverse elements (e.g., multiple words, mixed character types) can be assigned higher \( P(S_j) \).
+  
+- **Low-Complexity Structures:** Structures that are simple or have predictable patterns should have lower \( P(S_j) \).
+
+Mathematically, this can be approached by defining an objective function that weighs structures based on their \( H(\mathcal{E} \mid S_j) \):
+
+\[
+P(S_j) \propto e^{\lambda H(\mathcal{E} \mid S_j)}
+\]
+where \( \lambda \) is a scaling parameter that controls the emphasis on entropy.
+
+\subsubsection{Example with Zipf’s Law for Element Distribution}
+
+Assuming elements within structures follow Zipf’s law, the conditional entropy \( H(\mathcal{E} \mid S_j) \) for a structure \( S_j \) can be computed as:
+
+\[
+H(\mathcal{E} \mid S_j) = - \sum_{e_i \in \Sigma_j} P(e_i \mid S_j) \log P(e_i \mid S_j)
+\]
+where \( \Sigma_j \) is the set of possible elements for structure \( S_j \).
+
+Given Zipf’s law:
+\[
+P(e_i \mid S_j) = \frac{1 / r_i^s}{\sum_{k=1}^{|\Sigma_j|} 1 / k^s}
+\]
+the entropy becomes:
+\[
+H(\mathcal{E} \mid S_j) = \log \left( \sum_{k=1}^{|\Sigma_j|} \frac{1}{k^s} \right) + s \frac{\sum_{e_i \in \Sigma_j} \frac{\log r_i}{r_i^s}}{\sum_{k=1}^{|\Sigma_j|} \frac{1}{k^s}}
+\]
+
+\subsubsection{Implications for Password Policy Design}
+
+\begin{itemize}
+\item Avoiding Uniform Structure Assignment: Mandating a single structure (e.g., three words) can reduce overall entropy, making passwords more predictable if attackers exploit the fixed structure.
+\item Encouraging Structure Diversity: Allowing a variety of structures with probabilities tuned to maximize overall entropy ensures that while some users may use simpler structures, others utilize more complex ones, increasing the average complexity of the dataset.
+\item Ensuring Minimum Complexity: Introduce constraints to ensure that each structure contributes a minimum amount of entropy, preventing the selection of overly simplistic structures.
+\end{itemize}
+
+\subsubsection{Conclusion and Policy Recommendation}
+
+To maximize the complexity of the entire password dataset:
+\begin{enumerate}
+\item Adopt a Diverse Structure Policy: Allow multiple password structures rather than enforcing a single structure like three words. This diversity increases \( H(\mathcal{S}) \) and, when combined with appropriate \( H(\mathcal{E} \mid S_j) \), enhances overall dataset complexity.
+
+\item Optimize Structure Probabilities: Allocate higher probabilities to structures that offer higher conditional entropy, ensuring that more complex structures are prevalent.
+
+\item Incorporate Entropy Constraints: Ensure that each allowed structure meets a minimum entropy threshold to prevent the prevalence of weak password structures.
+
+\item Monitor and Adjust: Continuously analyze the password dataset to adjust structure probabilities and permitted structures in response to emerging patterns and threats.
+\end{enumerate}
+By strategically managing the distribution of password structures and their associated element complexities, the password policy can achieve maximal dataset complexity, enhancing security across the user base.

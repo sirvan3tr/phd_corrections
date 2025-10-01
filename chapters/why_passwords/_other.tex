@@ -1,0 +1,56 @@
+\section{Discussion}
+\label{sec::passwordninja::discussion}
+
+In this chapter, we presented a large-scale, human-labelled password dataset, which, to the best of our knowledge, is the first of its kind. We then demonstrated its utility by using it to empirically derive new facts and insights regarding password composition and strength. Additionally, we introduced novel techniques for expediting the labelling process and demonstrated how Large Language Models (LLMs) can be employed to label passwords. The rest of this section discusses our key insights, the significance of the dataset, and the limitations of our study.
+
+The method used to capture a dataset introduces a bias. Often, leaked datasets consist of hashes that have been cracked by various entities and subsequently redistributed. Passwords that remain uncracked are either omitted or included only in their hashed form. This omission, along with the presence of uncracked passwords, can distort the analysis. The value of the \hmail dataset lies in its acquisition through a phishing attack, allowing us to assume that it includes passwords of all complexities. In contrast, datasets derived solely from obtained hashes are likely to lack structures considered difficult to crack, such as sequences like $www$. The \hmail dataset does not exhibit signs of strict password policies, such as requirements for special characters, digits, or mixed character cases.
+
+\subsection{Impact}
+\label{sec::passwordninja::impact}
+
+\textbf{Password Modelling:} One of the key implications of this dataset is its potential to improve password modelling. By analysing the detailed breakdown of password structures, words, tags, and transformations, researchers can develop more accurate model passwords. This can help in assessing the strength of existing password policies and identifying potential vulnerabilities in authentication systems. Moreover, the insights gained from the dataset can guide the development of new password guessing tools and techniques. Password guessing strategies are useful because they allow us to discover new vulnerabilities in our passwords and thus use that knowledge to develop better password composition policies and strength meters.
+
+\textbf{Supervised Learning:} This labelled dataset has the potential to be used for supervised learning techniques. It can also be used for evaluation techniques of other ML techniques.
+
+\textbf{Approximate String Matching:} Design and evaluation of new string matching algorithms. The problem of password similarity is closely related to string matching. However, measuring password similarity is more difficult than measuring normal strings. The text transformations, phonetic changes, and concatenation of other words and symbols increase the difficulty. Password similarity algorithms are important and have numerous use cases. In password strength meters, they help determine how closely a user’s password resembles existing passwords that may be deemed weak. If we are developing an algorithm to generate passwords, a similarity algorithm may be required to measure the difference between the generated password and the true password. A password similarity algorithm operates under the assumption that we have~a~model~of~the~password.
+
+\textbf{Password Strength Meters:} The labelled dataset can serve as a benchmark for evaluating the performance of password strength meters and other tools that assess password quality. By comparing the predictions of these tools against the actual composition patterns and structures present in the dataset, researchers can identify limitations and areas for improvement in existing password strength estimation techniques.
+
+Dictionary-based PSMs, such as the \zxcvbn PSM, rely on finding patterns in a password in order to determine the strength of the password. This means it needs to decompose the password and understand the transformations if there are any. Missed patterns could mean that a password's strength is incorrectly measured. In fact, \zxcvbn does miss some patterns as we shall in more detail below. Patterns such as \texttt{asdf1fdsa1} \cite{noauthor_password_nodate} get a high strength score of 3/4 from \zxcvbn. To answer the question, the transformations discovered in Section~\ref{sec::chp4::results} can be implemented into PSMs such as \zxcvbn to give a more accurate measure of strength.
+
+\textbf{Synthetic Data Generation:} With the ethical issues raised against using real datasets, one can attempt to generate synthetic data that closely match real passwords. You can also create synthetic passwords based on other languages but preserving the structures.
+
+\textbf{Natural Language Processing (NLP):} The dataset contains slang words and other transformations that can be used for natural language modelling. At least it can inform the modelling process. It can also be used for specific tasks such as Named Entity Recognition (NER) in datasets where there are spelling mistakes or accidental concatenation of words.
+
+\textbf{Education:} By understanding common password composition patterns and the prevalence of certain structures and transformations, we can design targeted educational campaigns and materials that address specific weaknesses and promote best practices for creating strong passwords. Insights from the dataset help craft more effective risk communication strategies and guide users toward adopting more secure password habits.
+
+\subsection{Ethical Considerations}
+\label{passwordninja::ethicalconsiderations}
+
+We have used real passwords that belong to individuals that were phished and consequently tricked into revealing their passwords. This raises few ethical issues: whether this in depth analysis will hurt those users? will it reveal any other secrets? will it identify any individuals? This dataset dates back to 2009 and therefore it is highly unlikely that the same users would have kept their passwords the same even if the identity of the individual could be revealed. Identities are highly unlikely to be revealed through our data. We have not used any PII or any other information that could link back to individuals. This dataset has also been previously used in other research papers.
+
+This new dataset and repository of the data have been created solely for academic research purposes. The data, sourced from publicly accessible repositories like SecLists \cite{miessler_danielmiesslerseclists_2024}, does not reveal any novel information. Our analysis also does not expose any new details about the original users associated with these passwords. Importantly, this dataset is devoid of any personally identifiable information (PII).
+
+The use of breached and leaked password datasets is well established in published research, with some studies even incorporating PII such as email addresses and dates of birth. As such, this work aligns with existing practices in the field and does not necessitate additional scrutiny. Analysing leaked datasets is crucial for advancing our understanding of how human-chosen secrets are employed, ultimately enabling us to enhance their resilience against malicious actors.
+
+\vspace*{-0.6cm}
+\subsection{Limitations}
+\vspace*{-0.2cm}
+
+There is a portion of the dataset that is labelled as R2 that could be studied further. Some of these passwords were difficult to label.
+The presence of human errors and inconsistencies in the labelling process is a notable limitation of our work. It is reasonable to assume that human-labelled datasets will contain some inaccuracies. Nevertheless, these errors are generally negligible. To mitigate these issues, we propose the development of an online dashboard that allows users to continuously identify and correct any errors.
+
+Labelling passwords in non-native languages presents additional inconsistencies for human agents, primarily due to limited vocabulary and unfamiliarity with linguistic nuances. Implementing an online portal where native speakers can rectify these errors would be advantageous over time. Such a system could also facilitate the creation of an extensive phonetic dictionary, encompassing words and names that are typically challenging to locate in centralised repositories.
+
+A notable limitation of this study is its applicability to datasets in languages other than English or Spanish, such as Chinese. While Chinese datasets and literature are extensively researched, direct model transfer is not feasible. However, the methodology and insights into password patterns may be adaptable. Investigating how cultural differences manifest in password choices, including variations in structural patterns, vocabulary categories, and word types, could yield significant insights. Given that literature and art reflect societal and cultural contexts, passwords may similarly serve as indicators within the same domain.
+
+Some passwords are constructed using abbreviations, codes, or acronyms that are comprehensible only to their creators. Decomposing these into meaningful components is often impractical, warranting their categorisation under the ``R2'' label. However, these passwords are typically short and susceptible to basic brute-force attacks, diminishing~the~security~of~their~cryptic~elements.
+
+\section{Summary}
+In this chapter, we present the first large-scale, human-labelled password dataset, comprising over 8\,000 passwords from the complete \hmail dataset, a selected subset of the \phpbb dataset, and machine-labelled entries from the \lizardsquad (2015) dataset. These datasets encompass a range of password complexity elements, including chunks, words, structures, tags, and transformations. The applications of this dataset are numerous, spanning supervised learning, education, and password modelling.
+
+We have developed a rigorous model that incorporates password structure and empirical user behaviour patterns, filling a critical gap in our understanding of password security. Through analysis of real-world password datasets, we demonstrate that structure-based password policy such as three-words $(w,w,w)$ empirically and theoretically offer security advantages. However, the NCSC's previously recommended three-word password policy, while theoretically sound, fail to account for users' non-uniform word selection which follows a Zipf-like distribution. Our framework provides both theoretical foundations and practical guidelines for developing more robust authentication policies that reflect actual user behaviour rather than theoretical ideals.
+
+We recommend extending the NCSC's password composition policy to require five words, which our models show provides comparable security to the theoretical three-word ideal even under real-world usage patterns. This recommendation maintains usability while providing demonstrably stronger protection.
+
+Additionally, we investigated methods to streamline the time-consuming and costly process of password labelling. We employed freelancers and compared their performance with that of language models such as GPT-3.5-turbo, Mistral7B, LLaMa2, and their variations. Freelancers took approximately seven days to label \num{1000} passwords each, with results that were sometimes inconsistent. In contrast, language models proved to be~fast,~adaptable,~and~accurate.

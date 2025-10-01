@@ -1,0 +1,204 @@
+\section{Selective Disclosure Theory}
+\label{sec::chp6::selective-disc-theory}
+
+\begin{figure}[h!]
+    \centering
+\begin{tikzpicture}[font=\small, node distance=2.5cm, >=latex, 
+  every node/.style={draw, rectangle, minimum width=1.2cm, minimum height=0.8cm, align=center},
+  level/.style={sibling distance=2cm, level distance=1.5cm}]
+
+  %%% Leaves (Merkle tree leaves)
+  \node (L1) at (0,0) {$L_1 = H(s_1^\text{(salt)} \| a_1)$};
+  \node (L2) at (4,0) {$L_2 = H(s_2^\text{(salt)} \| a_2)$};
+  \node (L3) at (8,0) {$L_3 = H(s_3^\text{(salt)} \| a_3)$};
+  \node (L4) at (12,0) {$L_4 = H(s_4^\text{(salt)} \| a_4)$};
+  
+  %%% Internal nodes (hashes of leaves)
+  \node[circle] (H12) at (2,2) {$H_{1,2}$};
+  \node[circle] (H34) at (10,2) {$H_{3,4}$};
+  
+  %%% Root node
+  \node[circle] (R) at (6,4) {$R$};
+
+  %%% Draw edges
+  \draw[->] (L1) -- (H12);
+  \draw[->] (L2) -- (H12);
+  \draw[->] (L3) -- (H34);
+  \draw[->] (L4) -- (H34);
+  \draw[->] (H12) -- (R);
+  \draw[->] (H34) -- (R);
+
+  %%% Label internal nodes with how they're derived (optional)
+  \node[above=0.1cm of H12, draw=none] {\small $H_{1,2} = H(L_1 \| L_2)$};
+  \node[above=0.1cm of H34, draw=none] {\small $H_{3,4} = H(L_3 \| L_4)$};
+  \node[above=0.1cm of R, draw=none] {\small $R = H(H_{1,2} \| H_{3,4})$};
+
+  %%% Highlight the path for L2 (selective disclosure)
+  \draw[very thick, color=blue] (L2) -- (H12);
+  \draw[very thick, color=blue] (H12) -- (R);
+
+  %%% Optionally, add a legend or annotation
+  % Mark the "disclosed path" in blue
+  \node[draw=none, text width=4cm, align=left, anchor=west] at (3,-1.3)
+  {\textcolor{blue}{\textbf{Disclosed Path}}: \\
+   $(L_2 \rightarrow H_{1,2} \rightarrow R)$};
+
+\end{tikzpicture}
+    \caption{Selective disclosure in a Merkle tree. The diagram illustrates a four-attribute identity structure with leaf nodes $L_j = H(s_j^{\text{(salt)}} \| a_j)$. The blue path highlights the selective disclosure of attribute $a_2$, where only $L_2$ and the auxiliary path information $(L_2, H_{1,2}, R)$ are revealed, enabling verification against the root $R$ without exposing the undisclosed attributes $a_1$, $a_3$, and $a_4$. This demonstrates how Merkle proofs facilitate attribute verification while preserving privacy.}    
+
+    \label{fig::chp6::selective-disclosure}
+\end{figure}
+
+\subsection{Overview}
+
+Treating services as adversarial dictates that we should reveal as little information as possible. While Fiat--Shamir zero-knowledge cryptosystems ensure that secrets themselves are not disclosed, they still require revealing various attributes of our identity. However, in real-world scenarios, a prover often needs to disclose only some attributes rather than all. For example, someone proving that they are German does not need to reveal other identity attributes. This is where \textit{Selective Disclosure} of identity attributes becomes crucial. We combine the Fiat--Shamir~\cite{fiat_how_1987} cryptosystem with a Merkle~tree~\cite{merkle1987digital} construction to selectively reveal certain attributes while keeping others hidden.
+
+The proposed approach combines the Fiat--Shamir zero-knowledge cryptosystem with a Merkle tree construction to achieve selective disclosure of identity attributes. Specifically, each attribute $a_i \in \mathcal{A}$ is hashed with a random salt $s_i^{\text{(salt)}}$ to create leaf nodes $L_i = H(s_i^{\text{(salt)}} \,\|\, a_i)$ in a Merkle tree with root $R$. During the disclosure protocol, the prover reveals only the selected attributes along with their corresponding salts and Merkle inclusion proofs $\pi_j$, while executing a Fiat--Shamir proof using secret values $s_j$ tied to these attributes. This novel combination ensures that undisclosed attributes remain hidden due to the Merkle tree's structural properties, while the cryptographic binding between the attributes and the identity credentials is maintained through the Fiat--Shamir protocol, effectively addressing the limitation of traditional zero-knowledge systems that require revealing all identity attributes.
+
+\subsection{Preliminaries and Setup Phase}
+
+Our selective disclosure protocol operates on a set of identity attributes $\mathcal{A} = \{a_1, a_2, ..., a_m\}$, where each $a_i$ represents a statement about identity (e.g., ``\textit{over 18}'', ``\textit{British Citizen}''). The cryptographic foundation rests on three key components: a secure cryptographic hash function $H: \{0,1\}^* \rightarrow \{0,1\}^l$, a Merkle tree construction $\mathcal{MT}$ capable of generating and verifying inclusion proofs, and an RSA modulus $n = pq$ where $p$ and $q$ are large primes.
+
+For each attribute $a_i \in \mathcal{A}$, we generate a unique random salt and then compute a salted hash commitment:
+$$L_i = H(s_i^{\text{(salt)}} \,\|\, a_i)$$
+
+Next, we build the Merkle tree from the leaves $L_i$. The Merkle root $R$ becomes our identity string (which is represented as $I$ in the Fiat--Shamir protocol.)
+
+\paragraph{Key\;Generation.}\;We follow the Fiat--Shamir protocol and have a trusted identity issuer create $v_j = f(R, j) \mod n$.
+
+\paragraph{Selective Disclosure Protocol.} To prove an attribute $a_i$:
+\begin{itemize}
+    \item Disclose $a_i$
+    \item Provide the Merkle path for $L_i$
+    \item Perform Fiat--Shamir interaction to prove knowledge of $s_j$, using $R$ as the public identity.
+\end{itemize}
+%During the setup phase, we commit to each attribute through a carefully constructed salting mechanism. For each attribute $a_j \in \mathcal{A}$, we generate a unique random salt $s_j^{\text{(salt)}} \stackrel{R}{\leftarrow} \{0,1\}^k$ and compute a salted hash commitment:
+
+
+These leaf nodes $\{L_1, \ldots, L_m\}$ are then organised into a Merkle tree $\mathcal{MT}$, culminating in a root $R$ that serves as a succinct cryptographic commitment to the entire attribute set. This elegant construction achieves two essential objectives: it enables efficient verification of attribute membership during disclosure, while the tree's structural properties ensure undisclosed attributes remain hidden from verifiers. The salting mechanism further strengthens privacy by ensuring that even identical attributes yield distinct leaf hashes, effectively thwarting dictionary attacks and enhancing the overall security of our selective disclosure protocol.
+
+
+%\subsection{Selective Disclosure Protocol}
+%
+%Suppose the prover wants to \emph{selectively} disclose a subset of
+%their attributes, indexed by $\mathcal{D} \subset \{1,\ldots,m\}$. In
+%other words, the prover wants to prove possession of $(a_j)_{j\in \mathcal{D}}$
+%and also execute a Fiat-Shamir-like proof tied to those attributes
+%\emph{without} revealing the undisclosed attributes $\{a_j: j\notin\mathcal{D}\}$.
+%
+%\subsubsection*{Prover (Commitment):}
+%
+%\begin{enumerate}
+%    \item Choose a random $r \stackrel{R}{\leftarrow} \mathbb{Z}_n^*$.
+%    \item Compute $x = r^2 \bmod n$.
+%    \item For each disclosed attribute index $j \in \mathcal{D}$, retrieve the 
+%    corresponding Merkle-leaf hash $L_j$ and generate a Merkle inclusion 
+%    proof $\pi_j = \text{MerkleProof}\bigl(j, L_j, \mathcal{MT}\bigr)$ 
+%    that convinces a verifier that $L_j$ is indeed in the Merkle tree 
+%    with root $R$.
+%    \item Send $(\,x,\; \{\,(\,a_j,\;s_j^\text{(salt)},\;\pi_j\,)\}_{j \in \mathcal{D}}\,)$ 
+%    to the verifier. Here, $a_j$ and $s_j^\text{(salt)}$ allow the verifier 
+%    to recompute $L_j = H(s_j^\text{(salt)}\|\;a_j)$ and check it against 
+%    the Merkle proof $\pi_j$ and root $R$.
+%\end{enumerate}
+%
+%\subsubsection*{Verifier (Challenge):}
+%
+%\begin{enumerate}
+%    \item The verifier checks each provided Merkle proof $\pi_j$ for 
+%    correctness by ensuring that $L_j$ indeed corresponds to the path 
+%    that leads to root $R$.
+%    \item The verifier also checks that $L_j = H\bigl(s_j^\text{(salt)}\|\;a_j\bigr)$ 
+%    for each disclosed attribute $j \in \mathcal{D}$.
+%    \item If these checks succeed, the verifier issues a random challenge 
+%    \[
+%        e = \bigl(e_1,e_2,\dots,e_m\bigr),
+%    \]
+%    where each $e_j$ is typically 1 bit (or a small number of bits), 
+%    and only $e_j$ for $j \in \mathcal{D}$ are relevant (the others 
+%    can be set to 0, or the subset structure can be indicated in some 
+%    canonical way).
+%\end{enumerate}
+%
+%\subsubsection*{Prover (Response):}
+%
+%\begin{enumerate}
+%    \item Compute the response
+%    \[
+%       y \;=\; r \;\prod_{j \in \mathcal{D}}\, s_j^{\,e_j}
+%       \;\bmod n.
+%    \]
+%    \item Send $y$ to the verifier.
+%\end{enumerate}
+%
+%\subsubsection*{Verifier (Final Check):}
+%
+%The verifier checks the core Fiat-Shamir equation:
+%
+%\[
+%    x \;\stackrel{?}{=}\; 
+%    \Bigl(y^2 \;\prod_{j \in \mathcal{D}}\; v_j^{\,e_j}\Bigr)
+%    \bmod n.
+%\]
+%
+%If this congruence holds, the verifier accepts; otherwise the verifier 
+%rejects.
+%
+%\subsection{Security Analysis}
+%
+%\subsubsection{Zero-Knowledge}
+%
+%\begin{enumerate}
+%    \item \textbf{Attribute Hiding via Merkle Tree.} 
+%    The attributes that are not disclosed do not appear in any revealed 
+%    path of the Merkle tree, hence they remain hidden.
+%    \item \textbf{Fiat-Shamir Zero-Knowledge.}
+%    The standard Fiat-Shamir protocol is zero-knowledge in the random 
+%    oracle model. The responses $(r, y)$ and challenge $e$ reveal no 
+%    additional information about undisclosed $s_j$ values.
+%    \item \textbf{Salts Prevent Dictionary Attacks.}
+%    Using per-attribute salts $s_j^\text{(salt)}$ when computing 
+%    $L_j = H\bigl(s_j^\text{(salt)}\|\,a_j\bigr)$ ensures that an 
+%    attacker cannot simply guess attributes and verify them offline 
+%    (i.e., a brute-force or dictionary attack).
+%\end{enumerate}
+%
+%\subsubsection{Soundness}
+%
+%\begin{enumerate}
+%    \item \textbf{Merkle Tree Binding.} 
+%    Because $R$ is the root of the Merkle tree, any attempt to forge 
+%    attributes would cause the Merkle proof to fail or produce an 
+%    incorrect leaf.
+%    \item \textbf{Fiat-Shamir Soundness.} 
+%    The classical Fiat-Shamir soundness argument (in the random oracle 
+%    model or in a challenge-response setting) prevents impersonation: 
+%    forging a correct response for non-owned $s_j$ with high probability 
+%    is infeasible.
+%    \item \textbf{Binding Attributes to the Root.} 
+%    The root $R$ binds the set of attributes to the user's identity 
+%    credentials. Any modifications to a claimed attribute would require 
+%    recomputing the root, thus invalidating the public key.
+%\end{enumerate}
+%
+%\subsubsection{Completeness}
+%
+%For an honest prover who possesses all secret values $s_j$ and the random commitment $r$, the verification always succeeds. We can demonstrate this by examining the verification equation. The prover computes response $y = r\prod_{j \in \mathcal{D}} s_j^{e_j} \bmod n$, which gives us:
+%
+%$$
+%y^2 = r^2\prod_{j \in \mathcal{D}} s_j^{2e_j} \bmod n
+%$$
+%
+%Since each $v_j = s_j^{-2} \bmod n$, we have:
+%
+%$$
+%\prod_{j \in \mathcal{D}} v_j^{e_j} = \prod_{j \in \mathcal{D}} (s_j^{-2})^{e_j} = \prod_{j \in \mathcal{D}} s_j^{-2e_j} \bmod n
+%$$
+%
+%Combining these expressions in the verification equation:
+%
+%$$
+%y^2 \prod_{j \in \mathcal{D}} v_j^{e_j} = \left(r^2 \prod_{j \in \mathcal{D}} s_j^{2e_j}\right) \left(\prod_{j \in \mathcal{D}} s_j^{-2e_j}\right) = r^2 \bmod n
+%$$
+%
+%The verifier's check $x \stackrel{?}{=} y^2 \prod_{j \in \mathcal{D}} v_j^{e_j}$ succeeds precisely because $x = r^2 \bmod n$, thus confirming the protocol's completeness property.

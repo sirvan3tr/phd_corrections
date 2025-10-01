@@ -1,0 +1,60 @@
+\begin{table}[h]
+\footnotesize
+\centering
+\begin{tabular}{ccl}
+\toprule
+\textbf{Layer} & \textbf{OSI Layer} & \textbf{Authentication Schemes} \\
+\midrule
+7 &
+Application & 
+  \begin{tabular}[c]{@{}l@{}}
+    - Password-based authentication \\
+    - Multi-factor authentication (MFA) \\
+    - Single Sign-On (SSO) \\
+    - OAuth (Open Authorization) \\
+    - OpenID Connect \\
+    - Kerberos \\
+    - LDAP authentication \\
+    - RADIUS \\
+    - WebAuthn/FIDO2
+  \end{tabular} \\
+\midrule
+6 &
+Presentation & - No specific authentication schemes \\
+\midrule
+5 &
+Session &
+  \begin{tabular}[c]{@{}l@{}}
+    - SSL/TLS \\
+    - SSH \\
+    - RPC authentication
+  \end{tabular} \\
+\midrule
+4 &
+Transport &
+  \begin{tabular}[c]{@{}l@{}}
+    - TCP authentication (TCP-AO) \\
+    - SCTP authentication
+  \end{tabular} \\
+\midrule
+3 &
+Network &
+  \begin{tabular}[c]{@{}l@{}}
+    - IPsec \\
+    - Authentication Header (AH) \\
+    - Encapsulating Security Payload (ESP)
+  \end{tabular} \\
+\midrule
+2 &
+Data Link &
+  \begin{tabular}[c]{@{}l@{}}
+    - Port-based Network Access Control (PNAC) or 802.1X \\
+    - MAC address filtering
+  \end{tabular} \\
+\midrule
+1 &
+Physical & - No authentication schemes \\
+\bottomrule
+\end{tabular}
+\caption{Examples of authentication schemes by OSI network layers.}
+\end{table}

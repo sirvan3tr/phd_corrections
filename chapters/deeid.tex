@@ -1,0 +1,269 @@
+\chapter{Password-less Authentication and Identification}
+\label{chp::deeid}
+
+This chapter designs and implements a passwordless system---\deeid---for identification to mitigate impersonation attacks. \deeid is a blockchain-based system that enables passwordless authentication and identification by extending the Fiat--Shamir protocol to support multiple identity issuers. Blockchain is used as a decentralised public-key infrastructure, providing identity verification without relying on passwords or centralised authorities while maintaining compatibility with existing web technologies.
+
+\section{Introduction}
+\label{sec::chp6::introduction}
+\begin{figure}[ht]
+\centering
+\noteBox{Identification}{
+Here we make a distinction between \textit{Identification} and \textit{authentication} as per the Fiat--Shamir~\cite{fiat_how_1986} definitions. Consider a universe of users $U = \{u_1, u_2, ..., u_n\}$ and a proof function $P(x,y,c)$ where $x$ proves to verifier $c$ that they are user $y$, returning true if successful and false otherwise. Formally, $P: U \times U \times U \rightarrow \{\text{true}, \text{false}\}$. Authentication requires that for any user $A$ and verifier $B$, $A$ can prove their identity $(P(A,A,B) = \text{true})$ while no other user $X$ can successfully claim to be $A$ $(\forall X \neq A: P(X,A,B) = \text{false})$. Identification strengthens this by adding the constraint that even the verifier $B$ cannot replay $A$'s proof to impersonate them $(\forall X \neq A: \forall Y: P(B,A,Y) = \text{false})$. This hierarchy establishes that: 
+$$\text{Identification} \implies \text{Authentication}$$
+$$\text{Authentication} \not\implies \text{Identification}$$
+capturing the distinction that identification prevents replay attacks while authentication only prevents initial impersonation.
+}
+\end{figure}
+%\begin{figure}
+%\noteBox{Contributions}{
+%\begin{itemize}
+%    \item ZK Identity Proof
+%    \item Decentralised
+%    \item Selective disclosure
+%    \item deeID protocol (design and implementation)
+%\end{itemize}
+%}
+%\end{figure}
+
+Many organisations and digital identity systems rely on a flawed premise to carry out identification: using information such as date of birth, addresses, and other similar public PII. These poor practices often lead to \textit{identity theft} and \textit{impersonation} attacks. Well-resourced attackers can further exploit this publicly available information: in one incident, an attacker used deepfake technology to impersonate a company executive and successfully convinced an employee to transfer US\$25~million~\cite{milmo_uk_2024}. In another case, an attacker compromised the SEC's Twitter/X account using a SIM-swapping attack facilitated by a fake ID and impersonation~\cite{kan_hijack_2024}. These cases demonstrate that we should seldom rely on readily available information for authentication and identification.
+
+This chapter represents not only a step in our journey of protecting user secrets but also a vision and a fundamental shift in how we think about identification and authentication---moving from what you know (passwords, personal information) to stronger forms of identification and authentication. WebAuthn and passkeys have made enormous strides since 2022 in moving beyond passwords. While this chapter addresses authentication, it primarily focuses on the challenges of identification, as exemplified by the real-world examples in the previous paragraph.
+
+Decentralisation is motivated and achieved using Blockchain. Blockchain has proven to have numerous important applications beyond its initially conceived purpose of digital cash (Bitcoin~\cite{nakamoto_bitcoin:_2009} since 2009). Its use as a public-key infrastructure (PKI) and in identity management represents two significant examples with considerable implications for web applications. Namecoin~\cite{noauthor_namecoin_nodate}, Blockstack~\cite{noauthor_blockstack_nodate}, and Certcoin~\cite{fromknecht_certcoin_2014} exemplify organisations attempting to recreate DNS, identity, and certification services using Blockchain. Additional implementations utilising Blockchain as a PKI include applications for IoT devices~\cite{pinto_blockchain-based_2020} and identity management~\cite{boontaetae_rdi:_2018}.
+
+\textbf{Threat\;Scenario.}\; Modern attackers exploit identity weaknesses not only through sophisticated social engineering campaigns but also through insider threats and compromised services. While traditional security models assume services can be trusted, we must consider that the very systems we authenticate with may be adversarial. Insiders with privileged access can bypass security controls, exfiltrate identity data, or manipulate authentication processes. Service providers themselves may be compromised, coerced, or simply negligent in protecting identity information. By combining publicly available information with AI-generated content and insider knowledge, attackers can build highly convincing attacks that exploit both technical vulnerabilities and human trust relationships. This interconnected nature of identity systems, coupled with the necessity to treat authentication services as potentially hostile actors, means that a compromise in one area can cascade into unauthorised access across multiple domains.
+
+Identity verification relies on layers of proof, with each document typically deriving its authority from another. People accumulate multiple forms of identification throughout their lives, from birth certificates to passports and driver's licences. Organisations often require several of these documents because forging multiple forms of identification costs more time and resources than most criminals can afford to spend. This layered approach builds trust through accumulated proof: as people conduct more transactions and interact with more institutions, they establish a deeper foundation of verified identity. However, many online services have abandoned this protective layering in favour of simplified verification. They often require only basic personal details, such as names, addresses, and birthdates, to open credit cards or insurance policies. Even phone-based authentication typically demands just these surface-level facts, making digital identity theft significantly easier than forging traditional documents. This weakness in online verification undermines the security that traditional layered identification systems provide.
+
+This concept of \textit{identity credit} remains vulnerable to criminal exploitation through \textit{synthetic identity fraud}~\cite{noauthor_combating_nodate}. In this scheme, criminals fabricate fictional identities and establish legitimate financial and credit histories for them. This manufactured credibility makes the identity appear genuine to challengers. However, it merely serves as a stepping stone for criminals to gain access to larger credit facilities and finances. This vulnerability is perpetuated, in part, by the absence of a common, trusted service that all organisations could use for identity verification.
+
+The benefits of the proposed system are numerous. Firstly, the most obvious application is the replacement of username and password combinations for authentication. With a secure, up-to-date, and decentralised key-store, it presents a practical alternative, particularly considering potential cost savings regarding lost passwords~\cite{wolfond_blockchain_2017}. Secondly, it provides a straightforward method to prove one's identity online through identity providers (e.g., your bank can serve as a trusted identity provider). Thirdly, it can help reduce phone scams, identity fraud, and related crimes by ensuring that access relies less on common personal information and more on a combination of ``what we possess'' (a mobile phone with strong private keys) or ``what we know'' combined with ``what we have'' (fingerprint access to our mobile phones). Finally, it introduces flexibility and consistent standards to organisations, countries, and continents where gaps in standards and trust exist.
+
+%\input{chapters/deeid_selective_disclosure}
+
+\section{Design}
+\label{sec::chp6::design}
+
+The key innovation opportunity lies in creating an identity system that: (1) preserves privacy through zero-knowledge proofs, (2) supports multiple identity issuers in a decentralised way, (3) maintains compatibility with existing infrastructure, and (4) provides stronger security guarantees than current systems. While WebAuthn solves the authentication problem well, it does not address the broader identity management and verification challenges that \deeid attempts to solve. The novel contribution would be in creating a comprehensive identity framework that extends beyond simple authentication to handle complex real-world identity verification scenarios.
+
+%%%%
+Abandon the traditional approach of asking users to memorize strings, numbers and symbols for authentication. This naturally leads us away \textit{what you know} authentication factors and towards \textit{what you have} or \textit{what you are}.
+
+\textbf{Compatibility.} Compatible with existing browsers and existing technology that use the email/password combination for authentication. The user must not download new browsers. Developers should be able to use existing JavaScript or Python web stacks to implement \deeid\ as an authentication scheme.
+
+\textbf{Key Store Management.} Shared and equal access to public keys that link users to their identities, ensuring transparency and verifiability within the system. This assumes that a user can possess multiple keys (e.g., for different devices and keys for encryption), allowing flexibility and enhanced security across various use cases.
+
+\textbf{Dynamic Identity.} Ability for anyone to issue identities to individuals. Utilise and implement the Fiat--Shamir scheme for multiple identity issuers.
+
+\textbf{Privacy by Design.} Cannot record any personal details on the public chain.
+
+\textbf{Unlinkable Authentication} Colluding actors cannot determine if our anonymous identity is the same across their servers and systems.
+
+\noteBoxNormal{Requirements}{%
+    Steps required before an entity can issue an identity: \\
+    Person \textbf{A}: The individual wishing to receive a new identity from another person or organisation.
+    
+    Person \textbf{B}: Identity issuer.
+    
+    \begin{enumerate}
+        \item \textbf{A}: Must create a \deeid\ representation on the blockchain, e.g. on Ethereum, create a unique contract as per the common standards.
+        \item \textbf{B}: Must also create a \deeid\ representation on the network.
+        \item \textbf{B}: Create a random modulus which is a product of two large prime numbers, $n = pq$, and n should be at least 512~bits.
+        \item \textbf{B}: Store $n$ on the network. In our implementation it is stored in a data structure on the \deeid\ contract.
+    \end{enumerate}
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Implementation}
+\label{sec::chp6::implementation}
+
+\subsection{Overview}
+\begin{figure}[t]
+    \center{\includegraphics[scale=0.5]
+    {figs/deeid/deeID_diagram.pdf}}
+    \caption{\label{fig:deeIDArchitecture} \deeid architecture overview. \srcOwnFig}
+\end{figure}
+
+The proposed system, \deeid, is a combination of technologies that enables a dynamic and decentralised identity system with functions compatible with existing services.
+Although the proposed system can be built on various devices, even a unique independent device solely for this application, we have assumed the implementation on a typical mobile device running Android or iOS.
+\deeid uses the Fiat--Shamir identification cryptosystem with a blockchain~that~acts~as~a~PKI.
+
+Figure \ref{fig:deeIDArchitecture} provides an overview of the system. The core components are:
+\begin{itemize}
+    \item \textbf{Distributed\;Ledger:}\;Our implementation uses Ethereum and we have developed several smart-contracts that act as portals and identity managers.
+    \item \textbf{Mobile\;Phone:}\;A device such as a mobile phone that can store private keys and interact with services and servers over the Internet (in part to ensure compatibility with existing web applications). We built a mobile phone application that allows the user to authenticate and identify (Fiat--Shamir scheme) themselves. The application uses QR codes to interact with web applications and then talk to servers (using WebSocket connection) to carry out the necessary functions (e.g. interactive Fiat--Shamir scheme).
+    \item \textbf{Libraries:}\;Required libraries that developers can install so that their users can use \deeid to authenticate themselves on the developer's application.
+\end{itemize}
+
+\noteBox{Analogy}{
+To effectively showcase the potential of \deeid, one could employ the analogy of an identity card. Figure~\ref{fig:idcard} illustrates this analogy, highlighting the three primary elements of an identity card:
+\vspace{0.25cm}
+
+\textbf{Photograph for verification:} We typically use the photograph of the individual on the identity card to identify the user. That is, the assumed valid ID card belongs to the individual trying to prove their identity to the challenger. In \deeid, this is done by the ownership of a private key associated with an identity. Via the Fiat--Shamir scheme, one would be able to prove their ownership of the private-key~and,~therefore,~identity.
+\vspace{0.25cm}
+
+\textbf{Human and machine readable strings:} We require a unique string that would uniquely identify the card. This string can also be used for record keeping with respect to the identity holder. Along with this unique string, we also have the full name of the user. Although it is typically not unique. However, it is what we use to identify with one another at the human level. In \deeid, the smart contract on the network with its unique address represents the unique~machine-readable~identity.
+\vspace{0.25cm}
+
+\textbf{Identity issuer's integrity:} The integrity of the identity card comes through trusting the physical card itself and its physical properties. This trust also assumes that the verifier trusts the organisation that has issued the card. We find organisations that require different proofs of identity, e.g. passport and driving license in the UK. Therefore, we are concerned with different issuers and their reputation. Reputation in itself would require a full research experiment; in the current state of \deeid we have used a simple link on the identity issuer's smart contract, which links to their web address if they have one proving that the owner has access to both.
+}
+
+\begin{figure}[h]
+    \center{
+    \textbf{Relating \deeid to an Identity Card}\par\medskip
+    \includegraphics[scale=0.65]
+    {figs/deeid/id_card.pdf}}
+    \caption{At the top we have the main components of an identity card and at the bottom we have the equivalent functions in \deeid. \srcOwnFig}
+    \label{fig:idcard}
+\end{figure}
+
+
+\subsection{Decentralised Public Key Infrastructure}
+\label{sec::chp6::dpki}
+
+A fundamental challenge in extending a scheme, such as the Fiat--Shamir scheme, to multiple identity issuers is a trustworthy and robust public-key management infrastructure. We leverage the decentralised public key infrastructure (DPKI) to enable \deeid to handle multiple identity issuers at the same time. Numerous studies have contributed to decentralised PKI (DPKI)~\cite{kubilay_certledger:_2019, dykcik_blockpki:_2018, yakubov_blockpgp:_2018, patsonakis_practicality_2019} and here we represent a simple solution built on Ethereum for \deeid. With this approach, the user can associate other public-keys to their identity, e.g. RSA keys for encryption and public-keys used on other devices that links back to the identity.
+
+Our DPKI implementation diverges from traditional certificate-based systems by anchoring key authenticity directly to verifiable identities. This represents a paradigm shift: instead of relying on certificate chains, we establish trust through the identity verification process itself. While existing DPKI solutions~\cite{kubilay_certledger:_2019, dykcik_blockpki:_2018, yakubov_blockpgp:_2018, patsonakis_practicality_2019} focus on certificate management, our approach integrates identity verification with key management.
+
+We assume that the user has ownership control of their \deeid smart contract, and thus any changes within the contract are not malicious. Furthermore, the integrity of the public keys falls under the actual \deeid, and individual public keys are not issued certificates as such. So, if a verifier has no knowledge of the user's \deeid, then they must first identify the \deeid user (through the Fiat--Shamir scheme).
+
+Adding new public keys to the smart contract \deeid is a simple process of invoking the \texttt{addKey()} function with the following arguments: \texttt{title}, \texttt{key} and \texttt{comment}. The criterion for adding the key is that the user must be the owner of \deeid---which in our implementation has been cross-checking the sender's address with the address of the owner (stored on the smart contract). A real-world application could use any of the keys stored on the \deeid to verify the integrity of the sender. Lastly, verifying a specific key would involve querying the blockchain with respect to the public key and \deeid, in our implementation we had a function \texttt{getKey()}, which would return all the details related to that key.
+
+Other blockchain-based PKIs are more traditional in that they use certifications, e.g. CertLedger~\cite{kubilay_certledger:_2019}  and CertCoin~\cite{fromknecht_decentralized_2014}. In \deeid authenticity and security come from the identification of the \deeid itself, which can depend on the identity issuer and the verifier's willingness to trust the issuer or not. Although in the current implementation of \deeid this verifier and issuer trust is not quantified, we envision that one would be able to add a quantifiable reputation layer.
+
+\subsection{Authentication}
+The \deeid authentication system comprises two primary components: a mobile client application and a server-side blockchain node implementation with associated libraries for Web3 integration. The architecture enables direct communication between the web application and mobile client during authentication flows.
+
+
+
+\deeid offers users a simpler way to authenticate themselves compared to passwords, while allowing developers to implement it using current technologies with minimal effort. The system accomplishes this through two interconnected components: a mobile phone running the \deeid app serves as the first component, while a server-side application operating a blockchain node with \deeid libraries installed serves as the second component. These libraries enable the web application to interact directly with the mobile phone during the authentication process.
+
+One can authenticate via four different methods:
+\begin{itemize}
+    \item \textbf{Explicit Link.} With this method, we are using the \deeid, i.e. identity smart-contract, to authenticate the user. Basically, using the PKI method. Once the user has a public-key stored on their \deeid contract then they can use that to authenticate themselves using their \deeid. The user and the verifier have to query the chain for the existence of the specific public-key used to sign the authentication message. Lastly, because only \deeid is used to authenticate, the user can store multiple public keys on the contract and thus use multiple devices with different keys for authentication. At the end the typical session creation occurs, we have simply shown ``Login successful'' to re-iterate the unique points related to our protocol.
+    
+    \item \textbf{Generate a Public Key.} One can also avoid the use of the blockchain all together and simply generate a unique public-private key once they register with a website and use this public-key for authentication. The benefit of this is that the user can remain anonymous to the application. This also provides \textit{unlinkable authentication}. This means that two or more colluding servers are unable to determine if the user is using their platform. Although the colluding servers could use other means such as using IP address to guess if they have the same users.
+    
+    \item \textbf{Fiat--Shamir Identification.} The user can simply use the Fiat--Shamir scheme to also authenticate themselves. With this method you are also sharing your identity and its proof; this is therefore not useful if the user wishes to remain anonymous.
+    
+    \item \textbf{Strong Password.} Just like with the second method, one can use their mobile phone like a password manager and generate strong passwords to authenticate themselves with a given service.
+\end{itemize}
+
+\begin{table}[h]
+\centering
+\caption{Methods of authentication with \deeid.}
+\label{table:authmethods}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{l|cccc}
+\toprule
+\textbf{Auth Method} & \textbf{Chain} & \textbf{Query} & \textbf{Interactive} & \textbf{Multi} \\
+& \textbf{Storage} & \textbf{Chain} & & \textbf{Device} \\
+\midrule
+Explicit link to \deeid & \checkmark & \checkmark & \ding{55} & \checkmark \\
+Generate a public-key & \ding{55} & \ding{55} & \ding{55} & \ding{55} \\
+Fiat--Shamir identity & \checkmark & \checkmark & \checkmark & \ding{55} \\
+Strong password & \ding{55} & \ding{55} & \ding{55} & \ding{55} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{table:authmethods} summarises the above authentication methods. Although the choice of which authentication method to use is not entirely dependent on the user, we believe, ultimately, online behaviour will dictate which method is best suited to a given application. The differences between the authentication methods are primarily the use of blockchain and ease of use (e.g. multi-device and requirement of a mobile phone).
+
+\begin{figure}[t]
+    \center{
+    \textbf{Verifying an issued identity}\par\medskip
+    \includegraphics[scale=0.6]
+    {figs/deeid/verifyanidentity.pdf}}
+    \caption{Visualisation of how a traditional web page can authenticate a user's identity.\\\srcOwnFig}
+    \label{fig:VerifyanIdentity}
+\end{figure}
+
+\subsection{Issuing an Identity}
+We have described the system as dynamic and self-serving. This means that anyone and anything can issue an identity. This is done through the Fiat--Shamir scheme. Essentially, each issuer would have two large primes numbers that are kept secret, the product of these two are kept on the issuer's blockchain identity, i.e. smart-contract, so, when an identity holder claims to have been issued an identity, the verifier can check the existence of the product of the two large prime numbers within the issuers smart-contract or $\deeid_{\text{contract}}$.
+
+Below we go through an example of how an identity is issued by any other participant on the network. The first box states the requirements and the necessary steps required before two participants can create identities for each other. In our implementation we created a flask (Python based) app that allowed a user to create an identity. Therefore, most organisations and current systems are able to do so without much development overhead.
+
+In our implementation we created a Python function (described as $f$ throughout the chapter) that any developer can use to transform an identity string to a Fiat--Shamir public-key given the string, indices and $n$.
+
+
+\noteBoxNormal{Example of Issuing an Identity}{%
+    \begin{enumerate}
+        \item \textbf{A: } Hand over the required identity bits, $I_1$ = \{Fullname, DoB, deeID, City of Birth\}
+        \item \textbf{B: } Add a random string to $I_1$, and let that be $I$ hereafter.
+        \item \textbf{B: } Verify the identity of $A$ (e.g. face to face by looking at passport etc.)
+        \item \textbf{B: } If successful, create the credentials as follows:
+        \begin{enumerate}
+            \item Create the public-keys: $v_j = f(I,j)$ where $v_j$ is the public-key, $f$ is some pseudo-random function (\textit{Construction of such a function is explained in \cite{goldreich_how_1986}}) and $j$ are small random values; to create the public keys we pick $k$ distinct $j$ values for which $v_j$ is a quadratic residue $\mod n$, i.e. solution exists for $x^2 = v_j\mod(n)$
+            \item Calculate the secret keys for $A$ by taking the smallest $s_j = \sqrt{v_j^{-1}} \bmod{n}$.
+            \item So the set of $k$ public keys and associated $j$ values would give us two sets of values: $V = \{v_{j(1)}, v_{j(2)},\cdots,v_{j(k)}\}$ and $J = \{j_1, j_2,\cdots,j_k\}$
+        \end{enumerate}
+        \item Now $B$ can hand over $\{I, J, S, V\}$ to $A$. $V$ is technically not required because they can re-calculate it themselves if they have $I$ and $J$.
+    \end{enumerate}
+}
+%\end{tcolorbox}
+
+When an identity is issued, the state of the blockchain would not change; therefore there is no blockchain related costs associated with issuing new identities. The issuer would have the product of $p$ and $q$, $n$, within their smart-contract already, if not then the issuer would have to create a transaction and place $n$ within their \texttt{keys} array on the smart-contract, in this scenario there is an associated cost with this transaction.
+
+\subsection{Verifying a Legal Identity}
+
+By verifying a true identity, we mean that we are concerned with the actual real-life identity of the person. You can think of this as checking one's passport to get the real identity of the person we are concerned with. So, we have covered how you can issue an identity to someone, now we will go over how you can verify that identity. To give context, this would typically happen when one is applying for a credit card, insurance policy, or car finance online. Figure~\ref{fig:VerifyanIdentity} provides an overview of how we will proceed. We assume that the verifier (the backend and WebSocket servers) will have a set of trusted identity issuers \deeid addresses. Therefore, when they ask for an identity, they will ensure that the provided identity is provided by one of the trusted issuers. The actual authentication happens with the web server and the user's device (mobile phone); thus, for this to happen, the user has to first interact with the client, capture the required information, and then carry out the identification protocol with the WebSocket server. Upon the completion of the verification the server can update the client and carry out with the intended functions (e.g. registration and creating a session for the user).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55
+\section{Evaluation}
+\label{sec::chp6::evaluation}
+
+\begin{figure*}[h]
+    \center{
+    \includegraphics[trim={0 2cm 12cm 1cm},clip, scale=1]{figs/deeid/deeIDComparisonTable3.pdf}}
+    \caption{Visual evaluation of various schemes and our new blockchain-based scheme (\deeid).}
+    \label{fig:deeIDComp}
+\end{figure*}
+
+In \textit{The Quest to Replace Passwords}~\cite{bonneau_quest_2012}, Bonneau~\etal introduce a comprehensive framework to evaluate a wide range of authentication schemes, with particular emphasis on those employed in web-based environments. In the following section, we extend this analysis rigorously applying the framework to \deeid, critically examining its security properties, usability considerations, and overall performance in the context of modern authentication challenges.
+
+Starting with \textit{Usability benefits}, we believe \deeid provides \textit{Memorywise-Effortless} benefits, as there is no need to remember a password or secret. However, for enhanced security, we encourage users to maintain a PIN-protected device. The application is highly scalable for users, who can store unlimited credentials without additional burden, making it superior to passwords. Whilst users are required to carry a device, such as a mobile phone, this is an object they typically carry. The scheme is also \textit{Physically-Effortless}, as users need only aim their device and press a button to grant or decline a request. The scheme is also \textit{Easy-to-Learn} and intuitive, requiring only image scanning and pressing of the button. Moreover, it is much more efficient than passwords, \textit{Efficient-to-Use}, as users need only scan and press a button, rather than type or recall a password. Regarding \textit{Infrequent-Errors}, particularly compared to biometric schemes, the process is highly reliable with no false positives. However, the scheme presents challenges regarding the recovery of lost private keys; depending on which keys are lost, recovery methods are typically unavailable, necessitating replacement of lost credentials with the identity provider.
+
+Moving onto \textit{Deployability benefits}: The scheme is highly \textit{Accessible} and provides \textit{Negligible-Cost-per-User}; beyond access to a mobile phone device, users incur no additional expenses, which applies equally to the verifier. The scheme is also \textit{Server-Compatible}, meaning organisations can implement it using their existing technology. At the prover's end, no browser modifications are required, therefore it is \textit{Browser-Compatible}. Although it is not proprietary technology, it has not yet reached maturity at this stage.
+
+On \textit{Security-benefits}: The scheme is resilient to physical observations, as the secret is unobservable and all authentications occur without revealing secret keys. It demonstrates resilience to targeted impersonation, as knowledge of personal details cannot compromise the authentication scheme. Given that the scheme is challenge-response based and operates machine-to-machine (mobile phone to server), the failure rate for reasons other than incorrect keys is minimal, thus making successful guessing highly improbable. Unthrottled-guessing vulnerability depends on the identity provider and their key lengths. Resilient-to-Internal-Observation is notably robust, as users do not interact directly with private keys, rendering key logging and similar methods ineffective at revealing the secret key. Following the zero-knowledge principle of the Fiat--Shamir concept, information known to the verifier cannot reveal any details about the user's secret key. The scheme demonstrates resilience to phishing attacks, again due to zero-knowledge properties, as no secret-key information is revealed. Although the scheme shows less resilience to theft, the implementation of PIN protection renders it quasi-resilient-to-theft. Regarding \textit{No-Trusted-Third-Party}: the scheme operates independently of trusted third parties beyond the initial identity provision, eliminating their control and influence thereafter; should they become compromised, it merely necessitates discontinuing acceptance of identities from the newly untrusted third party. The scheme requires explicit user consent for authentication (requiring physical button activation after device log-in). In the absence of an authenticator, services cannot determine whether the same user is accessing various platforms. However, should verifiers collaborate and share user information, they could identify common users across their services. Crucially, the authentication scheme itself does not facilitate user linking.
+
+\section{Discussion}
+\label{sec::chp6::discussion}
+
+Human identification is an integral part of the security of the digital ecosystem. Though it is a missing element at the moment which is leading to account breaches, identity theft, and much more. In this chapter, we introduced the Fiat--Shamir scheme and have generalised it so that it could work on a larger scale with \textit{multiple} identity issuers. Our solution has been to use the blockchain as a decentralised PKI. Blockchain-based PKIs have shown promise in research and applications. Emergence of blockchain-based PKIs have come about mainly due to the weak-link security problem with respect to certificate authorities and the X.509 standard~\cite{noauthor_x.509_nodate} (other main PKI standard is OpenPGP~\cite{shaw_openpgp_nodate}). Consequently, this has led to new approaches such as the Google Certificate Transparency project~\cite{noauthor_certificatetr_nodate}. Blockchain PKI models such as~\cite{konoplev_blockchain_2018} attempt to overcome the weaknesses of current PKI standards.
+
+Essentially we have a p2p network and we have to represent the human identities on this network. How should the identity be represented? and what mechanisms are required to interact with the identity? Going back to our four rules: a) Capture: each identity must have a unique representation on the network. Each \deeid\ contract has a unique address. b) Recording: It must be machine and human readable. The \deeid\ contract address is unique and machine-readable. The user can also prove their identity and give their human readable names to the challenger. c) Security: can we protect from impersonation and other attacks? Best current method is using public-key cryptography and \textit{what we posses} rather than \textit{what we know} or \textit{what we are}. d) Verification: Using the mobile phone device and the Fiat--Shamir scheme we can verify identities easily.
+Similar to uPort we have represented the identity by a smart-contract which is uniquely identified in the network. Therefore, each identity has an interactive code on the network (managed by the identity holder themselves). So, here, identity is no longer a piece of string such as your full name, but a totally unique digital representation on a network. The benefit of this is that it is a single-source of truth that everyone can use and agree upon. So, your bank, hospital and school can all use the same identity. Using the same identity and authentication scheme can provide data sharing which in itself has huge benefits. We believe merging the Fiat--Shamir scheme with the existing blockchain identity methods is a novel method for an identification system.
+
+The benefit of using the Fiat--Shamir scheme over simply signing an identity string is the privacy and security it provides. Moreover it saves transactions and space on the network. However, it is still important to keep our 'full names', the basic string identity, because we humans still need to communicate with one another and be able to identify each other. Which is not possible if we are identified by a 512bit unique identity string. There have been studies such as \cite{bonneau_towards_2014}, \textit{'Towards reliable storage of 56-bit secrets in human memory'}, where the authors tried to see if we humans can remember long bits of string. The conclusion was that humans are able to learn cryptographic secrets (56-bit in this case), though it requires significant learning periods and other limitations such as recalling times.
+
+The issue of how do we trust the identity issuer falls upon the verifier. At the moment it is conceived to be a simple linear trace back of identities until the final link must somehow be verified. In our implementation we have a simple link to an official website or regulatory-body portal. However, there is considerable work to be done in improving this, e.g. one can quantify trust and provide recommendation to the verifier whether they are trust-worthy. A reputation-based network can provide some metric for verifiers to work from. However, one must consider the ethical implications of quantifying reputation, especially when we are considering real identities.
+
+Using \deeid as an alternative to a password for authentication provides many benefits beyond merely enhancing the raw security of the password itself. One potential risk of compromising one’s password and personal details arises when either the website (or its third-party libraries), browser, or operating system is compromised; \deeid simply reads a QR code and then transfers (which can also be encrypted) the relevant information to another server via a WebSocket connection. Thus, the browser, operating system, and any scrapers on the website are unable to steal the entered information. British Airways is reportedly being fined £183 million~\cite{noauthor_british_2019} for the 2018 breach of their site, in which thousands of customers’ personal information was stolen. Attackers compromised a script on the site~\cite{bishop_this_nodate} and were able to capture data as it was being entered on the page; even the \textit{CVV} (three digits on the back of a bank card), which no organisation stores, was stolen. Moreover, \deeid can inherently overcome such security threats. We use public keys and signature schemes as an alternative to a password for authentication, offering four different methods for authenticating ourselves. Some of these methods are achieved by allowing the user to store various public keys on their identity smart contract, and the user may also remove keys if they believe they have been compromised or are no longer valid.
+
+In our evaluation we followed the framework described in \cite{bonneau_quest_2012} to do a comparative analysis of \deeid with existing authentication schemes. Schemes such as: passwords, password managers, federated systems, hardware, mobile phone based systems, biometrics and more. The \deeid protocol uses cryptographic keys that are unpractical for humans to read, copy and transfer themselves without the help of a machine. Moreover, the computation required for these keys is impossible for humans to do. Thus, the use of a machine such as a mobile phone is required. Consequently, our protocol blurs the lines between hardware tokens, phone-based systems, federated and password management systems as shown in Figure~\ref{fig:deeIDArchitecture}.
+
+It should be noted that the framework in Figure~\ref{fig:deeIDArchitecture} is designed for human practicality, incorporating factors such as ``nothing to carry'', ``physical-effortlessness'' and ``memory-wise-effortless''. Therefore, the protocols are highly human-centric at present. Nevertheless, as we progress into the domains of AI and IoT, we can improve upon these protocols and frameworks to accommodate other non-human entities as well. Whilst no other system can surpass passwords that are easily stored and retrieved in our brains, as the number of passwords to remember increases, we encounter difficulties. Thus, the benefits of alternative schemes, such as password managers, become more apparent.
+
+
+The applications of \deeid are numerous. The clear use case is for authentication and an alternative to password. Next, identification via the Fiat--Shamir protocol for online services such as e-commerce.
+Preventing SIM swap attack is another use case of \deeid. SIM swap attack is where an attacker uses social-engineering (operator error and weakness) to convince the user's mobile carrier to swap the SIM to the attacker's SIM. The consequence of this is that the attacker can hijack accounts that use two-factor authentication (2FA). Notable hacks include the hijacking of celebrity Instagram accounts~\cite{bell_instagram_nodate} and individuals losing millions of pounds of cryptocurrency as their exchange accounts were linked to their mobile phone number using 2FA. This is a growing threat that is leading to more organised crime~\cite{franceschi-bicchierai_sim_2018}.
+Preventive techniques include using a PIN or better 2FA~\cite{wire_protect_swimswap}. However, these are patchy and preventive measures; a standardised solution through the use of decentralised identity like that of \deeid\ across mobile network carriers would be a better solution. Explicitly linking the user's \deeid\ to their SIM and having a hardware linked crypto keys - meaning that it is physical and malicious attackers cannot carry out their attack without access to the physical elements.
+When the SIM is linked to the user's \deeid\ (do this when the user acquires the SIM), the attacker would have to identity themselves which is far more difficult that knowing the user's name, address and date of birth.
+This brings us to identity theft. An attacker can steal an identity and order a credit card by only knowing the victims name, address and date of birth. Credit checks, for example, should be a push mechanism from the identity owner rather than a pull by knowing the victim's basic personal information. With \deeid\ the process of opening a credit account can be as follows: The credit agencies (Experian \cite{noauthor_experian_nodate}, Equifax \cite{noauthor_equifax_nodate} and TransUnion \cite{noauthor_transunion_nodate}) would encourage their customers to link their data to their \deeid. Once a company does a credit check through these credit agencies, the agency would notify the identity owner and request approval rather than automatically granting access. In reality, the economics of this is far more complex, however having a middle layer between the company asking for credit reports and the agency would allow savvy online users to protect their identity.
+
+The system does have its limitations. Most of them are related to the availability of research and technology rather than strong theoretical barriers. To begin with, with respect to identification, trusted third party has not been completely eliminated in this scenario. One can also ask whether if it is truly possible to get rid of the trusted third party at all? nevertheless, in this system the trusted third party, i.e. identity issuer, is only required at the beginning of the identity life-cycle. It is here that we would like to introduce the notion of dynamic trusted third party as opposed to a static one. One may think of the miners in the Bitcoin or Ethereum network as dynamic trusted third parties between two individuals transacting. In the Fiat--Shamir scheme, the identity issuer is a trusted third party but it is only required at the beginning.
+
+A security issue with any decentralised system is the potential threat from powerful entities such as state actors. If there is enough will power then they will be able to bring down most systems either directly or indirectly. This is important for a system that touches on security and privacy. Related to this is the consensus protocol of the blockchain system used. Our implementation used Ethereum and its proof-of-work consensus scheme. This consensus scheme has limitations in energy usage, trust of the miners. We believe alternative consensus schemes such as Proof-of-Stake or more experimental ones such as Proof-of-Reputation \cite{zhuang_proofofwork_2019} are better suited to a network exclusively built for identity management. The \deeid\ system is a general one - meaning, it can be be implemented on other blockchain technologies, adopted on either permissioned or permisionless network.
+
+Using a blockchain system on a mobile phone is also a challenge as we do not verify the integrity of the network on the mobile phone. In our implementation, we do the signing and transaction operations on the mobile phone but do not run a node as such on the device. In this context, the user would have to rely on another trusted node. An implementation of a light node would be another way of overcoming this challenge. This could form a further branch of future works.
+Revoking an identity could happen in reality. Currently, with the Fiat--Shamir scheme, if an issuer issues $x$ number of identities based on the public $n$ (product of $p$ and $q$) then revoking a single identity means revoking identities for all individuals using $n$. This is clearly a challenge and issuing and re-issuing identities if one identity need revoking is not efficient.
+
+\section{Summary}
+\label{sec::deeid::summary}
+
+In this chapter we have broken down the idea of identity, its representation and definition and explored how one can one uniquely identify themselves. We have compared our blockchain-based identity system with existing systems and typical password systems. We have argued that \deeid provides better security than federated, mobile phone-based, and hardware-based systems which in turn provide better security than passwords. Deployability is where most schemes fall back on compared to passwords. However, this is something that cannot be beaten due to 'knowing something' is more deployable than all other systems. Given that our system can inherently be a password manager too, it therefore strikes a better balance between the three major comparison factors of usability, deployability and security.
+
+\deeid can also be built on top of other blockchain technologies. Our novel contribution is improving upon identity representation through smart-contracts, allowing the blockchain as a cryptographic key management and a trusted-source of identities and providing a mechanism for people on the network to provide identities to one another. This was achieved by allowing the Fiat--Shamir scheme to have multiple identity issuers through the blockchain. This is most useful in the real world where multiple organisations can issue identities to the same individual.
+
+Future work can be separated into four different pillars, (1) General algorithm optimisation of the Fiat--Shamir cryptosystem. (2) We believe that an identity system such as the one proposed in this chapter could become an integral part of future blockchain systems that utilise Proof-of-Authority consensus schemes. A \deeid based Proof-of-Authority that is Byzantine Fault Tolerant with some quantifiable method for reputation to manage the network, (3) We have skewed our approach towards human identity, the definition can be debated, however one can extend the scheme to go beyond humans and make it a universal identity system for entities that include IoT devices, animals, fictional entities, and even cyborgs with vision of a decentralised galactic identity network. (4) Lastly, our design has been blockchain implementation agnostic, therefore one can think about interoperability of the scheme and how identities across networks can interact with one another.

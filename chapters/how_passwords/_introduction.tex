@@ -1,0 +1,25 @@
+\section{Introduction}
+\label{sec::chp5::introduction}
+
+Although significant research has focused on the composition and creation of passwords, the techniques used to guess or crack these passwords are equally important for understanding password security. However, we rarely see academic password guessing algorithms deployed and used in practice\footnote{We have only encountered \markovngram and \pcfg used in the wild.}, suggesting problems with existing approaches. So, we hypothesise that academic password guessing methods might be misaligned with practical requirements and therefore require a new form of benchmark. We investigate this in Section~\ref{sec::chp5::process}, where we combine the quality of the candidate passwords generated with the generation speed.
+
+\noteBox{Preimage Attack}{
+Password guessing can be formalized as a preimage search problem: given a hash value $y$, find an input $x$ such that $h(x) = y$, where $h$ is a cryptographic hash function and $x$ is the target password.
+}
+\paragraph{Problems\;with\;Existing\;Approaches.}\;A trivial solution for password guessing is an exhaustive search (brute force), but this is computationally infeasible for even moderate password lengths. More sophisticated approaches leverage patterns in human-chosen passwords to reduce the search space. However, existing techniques suffer from several drawbacks:
+
+\begin{itemize}
+\item Academic password guessing algorithms often prioritise candidate quality over generation speed, making them impractical for real-world applications where speed is critical.
+\item Many proposed techniques lack reproducibility and proper experimental controls, making it difficult to fairly compare different approaches.
+\item There is a significant disconnect between academic research and industry practice, with theoretical advances rarely translating to practical improvements.
+\end{itemize}
+
+Our aim is to systematically analyse password guessing algorithms in order to: 1) Provide a comprehensive overview and system for existing techniques and algorithms. 2) Establish a model to benchmark methods and algorithms that takes into account the quality and speed of candidate generation.
+
+
+In this chapter, we provide a systematisation of knowledge (SoK) of password guessing algorithms that bridges the gap between academic research and practical application. Our work provides:
+\begin{itemize}
+\item A unified framework for understanding and categorising password guessing algorithms.
+\item A framework that combines generation quality with generation speed to better measure the effective performance of password guessing algorithms.
+\item A detailed overview of \textit{Mask Attack} and their performance using the \pwdninja data set created in Chapter~\ref{chp4::password-composition}.
+\end{itemize}

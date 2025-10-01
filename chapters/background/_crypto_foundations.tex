@@ -1,0 +1,275 @@
+\section{Computational Hardness Assumptions}
+
+Much of modern security and cryptography is built upon one-way functions—functions that are easy to compute but difficult to invert. The \textit{difficulty} is based on computational and algorithmic efficiency. An algorithm is \textit{efficient} if it runs in polynomial time. More formally, an algorithm is considered efficient if its running time is bounded by a polynomial function of the input size. That is, for an input of size $n$, the running time is $O(n^k)$ for some constant $k$. Cryptographic primitives and protocols are often designed under the assumption that certain computational problems cannot be solved efficiently, i.e., in polynomial time. The hardness of these problems is crucial for maintaining the security of the cryptographic systems based on them. The hypothesis that a problem cannot be solved efficiently is known as the computational hardness assumption.
+
+\textit{Trapdoor one-way function} is a variant of the one-way function that requires a secret key. Using this secret key, one can invert the function; without it, it remains hard to invert.
+
+The existence of one-way functions remains an open conjecture in computer science. However, there are several promising candidates that have withstood attempts at inversion to date. For these functions, no efficient algorithms to compute their inverses have been discovered. Examples of such candidate one-way functions include:
+
+\begin{itemize}
+\item \textbf{Integer factorisation problem:} Given a positive integer $n$, find its prime factors. For example, if $n = pq$, where $p$ and $q$ are distinct prime numbers, the factorisation problem is to find $p$ and $q$ given only $n$. Also known as \textit{Factorisation Problem} or simply \textit{Factoring}.
+
+\item \textbf{RSA problem:} The RSA algorithm was the first public key encryption algorithm; though it was also invented by Clifford Cocks at GCHQ in 1973, four years before Rivest, Shamir and Adleman. The RSA problem is finding $m$ given the public key $(n, e)$ and a ciphertext $c \equiv m^e \pmod{n}$. The security of the RSA algorithm is no harder than the integer factorisation problem, so if we can solve the factoring problem, then we can solve the RSA problem. However, there is no proof that solving the RSA problem will help us solve the factoring problem (D. Boneh and R. Venkatesan Breaking RSA may not be equivalent to factoring). Also known as \textit{RSA Assumption} or \textit{RSA Inversion}.
+
+\item \textbf{Quadratic residuosity problem:} Given a composite number $n$ and an integer $a$, determine whether $a$ is a quadratic residue modulo $n$. In other words, find whether there exists an integer $x$ such that $x^2 \equiv a \pmod{n}$.
+
+\item \textbf{Discrete logarithm problem (DLP):} Given a finite cyclic group $G$, a generator $g$ of the group, and an element $h \in G$, find an integer $x$ such that $g^x = h$. The integer $x$ is called the discrete logarithm of $h$ with respect to $g$, denoted as $x = \log_g h$. This problem is considered hard in certain groups, such as the multiplicative group of a finite field or the group of points on an elliptic curve over a finite field.
+
+\item \textbf{Diffie-Hellman problem:} Given a finite cyclic group $G$, a generator $g$ of the group, and elements $g^a$ and $g^b$, where $a$ and $b$ are unknown integers, compute $g^{ab}$. This problem is closely related to the discrete logarithm problem and is used in the Diffie-Hellman key-exchange protocol. The assumption that this problem is hard is known as the Computational Diffie-Hellman (CDH) assumption.
+\end{itemize}
+
+
+Quantum computing does indeed pose a threat to some of the computational hardness assumptions, as quantum computers can solve some problems exponentially faster. Shor's algorithm~\cite{shor_polynomial-time_1997} can solve both the integer factorisation and discrete logarithm problems in polynomial time. This algorithm, for example, threatens RSA- and DLP-based cryptosystems, as it can factor an integer $n$ in $O((\log n)^3)$ time and $O(\log n)$ space.
+
+Post-quantum cryptography deals with finding quantum-resistant problems. For example, \textit{lattice problems} (such as the Shortest Vector Problem) are believed to be quantum resistant. NIST has been actively standardising the process for post-quantum cryptography since 2016. In August 2024, NIST released ML-KEM (CRYSTALS-Kyber) for key establishment. They also released ML-DSA (CRYSTALS-Dilithium) and SLH-DSA (SPHINCS+) for digital signatures. Other national organisations, such as the UK's NCSC, are actively providing guidance to navigate the post-quantum cryptography journey~\cite{ncsc_next_nodate}.
+
+Whilst quantum computers pose a threat to many cryptosystems, it is believed that cryptographic hash functions are quantum resistant. Thus, they do not undermine the security of password-based authentication systems. However, Grover's algorithm~\cite{grover_fast_1996} could aid a malicious user in inverting a function. Grover's algorithm can accelerate unstructured search problems, providing a quadratic speed-up compared to classical algorithms.
+
+\section{Cryptographic Hash Functions}
+
+A hash function is an umbrella term for functions with the following property. A hash function $h$ takes an arbitrary-length input $x$ and outputs $y$, a fixed-length bit string. This is often represented as: $h(x) = y$, where $x$ is the input, message, or preimage, and $y$ is the output, hash value, or hash digest. Table~\ref{tab:hash-functions} shows examples of hash functions and their key properties. In cryptography, we require the hash function to have specific properties for it to be useful. We differentiate it by calling it a cryptographic hash function or a collision-resistant hash function.
+
+Key properties of a cryptographic hash function are as follows.
+\begin{itemize}
+    \item \textbf{Preimage resistant}: Given a hash value $y$ it should be computationally infeasible to find an input string $x$ such that $y = h(x)$. i.e. it should be computationally infeasible to reverse the hash. Some literature may refer to this property as \textit{one-way property.}
+    
+    \item \textbf{Second preimage resistant}: Given some input $x_1$ and a hash value $y$, it should be computationally infeasible to find another input $x_2$ that results in the same hash value $y$. Some literature may refer to this property as \textit{weak collision resistant}.
+    
+    \item \textbf{Collision resistant}: It should be computationally infeasible to find two inputs that result in the same output. Some may refer to this as the \textit{strong collision resistant property}.
+\end{itemize}
+
+When designing a hash function, we also require small changes in the input to lead to a large change in the output. This is called the \textit{avalanche effect}.
+
+\begin{table}[t]
+    \centering
+    \caption{Overview of various hash functions and their key parameters. $n$ is block size in bits and $m$ is output size in bits.}
+    \label{tab:hash-functions}
+    $$
+    \begin{array}{lllllcl}
+    \toprule
+    \text{Hash function} & n & m & \text{Preimage} & \text{Collision} & \text{Collision Resistant} & \text{Construction} \\
+    \midrule
+    \text{SHA-1} & 512 & 160 & 2^{160} & 2^{80} & \text{No} & \text{Merkle-Damgård} \\
+    \text{SHA-256} & 512 & 256 & 2^{256} & 2^{128} & \text{Yes} & \text{Merkle-Damgård} \\
+    \text{SHA-512} & 1024 & 512 & 2^{512} & 2^{256} & \text{Yes} & \text{Merkle-Damgård} \\
+    \text{MD5} & 512 & 128 & 2^{128} & 2^{64} & \text{No} & \text{Merkle-Damgård} \\
+    \text{RIPEMD-160} & 512 & 160 & 2^{160} & 2^{80} & \text{Yes} & \text{Merkle-Damgård} \\
+    \text{Whirlpool} & 512 & 512 & 2^{512} & 2^{256} & \text{Yes} & \text{Miyaguchi-Preneel} \\
+    \text{Blake2b} & 1024 & 512 & 2^{512} & 2^{256} & \text{Yes} & \text{HAIFA} \\
+    \text{Blake2s} & 512 & 256 & 2^{256} & 2^{128} & \text{Yes} & \text{HAIFA} \\
+    \bottomrule
+    \end{array}
+    $$
+\end{table}
+
+Passwords are hashed alongside a unique and random string called a \textit{salt}; this is done per password to prevent \textit{look-up table} or \textit{rainbow-table} attacks. A rainbow table is a precomputed table used for caching the outputs of a cryptographic hash function. A secure method of password storage employs \textit{key derivation functions}. These functions still use one-way functions as primitives but are slower to compute and resistant to rainbow table attacks.
+
+\subsection{Key Derivation Functions}
+
+Key derivation functions (KDFs) are one-way functions that generate cryptographic secret keys from inputs such as passwords. For their use case in password storage and authentication, they offer several advantages over standard cryptographic hash functions. Standard hash functions are designed to be efficient and fast to compute. For password storage, this efficiency makes them insecure, especially as dedicated hardware makes it trivial to compute a large number of hashes per second. This allows an adversary to guess a vast number of passwords. KDFs aim to solve this problem by introducing CPU- and memory-intensive operations, thereby slowing down brute-force and other guessing attacks. Table~\ref{table:password_hash_comparison} shows various KDFs and their key properties.
+
+
+\begin{definition}[A password-based key derivation function]
+    A password-based key derivation function, or PBKDF, is a function H that takes as input a password $w \in \mathcal{P}$, a salt $s \in \mathcal{S}$, and a difficulty $d \in \mathbb{Z}^{>0}$. It outputs a value in ${0,1}^\ell$ for some $\ell$. We require that $H$ is computable by an algorithm that runs in time proportional to $d$. We say that the PBKDF is defined over $(\mathcal{P}, \mathcal{S}, {0,1}^\ell)$.
+\end{definition}
+
+\noteBox{NIST's Storage Recommendation}{%
+Verifiers SHALL store memorized secrets in a form that is resistant to offline attacks. Memorized secrets SHALL be salted and hashed using a suitable one-way key derivation function. Key derivation functions take a password, a salt, and a cost factor as inputs then generate a password hash. Their purpose is to make each password guessing trial by an attacker who has obtained a password hash file expensive and therefore the cost of a guessing attack high or prohibitive.
+
+Examples of suitable key derivation functions include Password-based Key Derivation Function 2 (PBKDF2) [SP 800-132] and Balloon [BALLOON]. A memory-hard function SHOULD be used because it increases the cost of an attack. The key derivation function SHALL use an approved one-way function such as Keyed Hash Message Authentication Code (HMAC) [FIPS 198-1], any approved hash function in SP 800-107, Secure Hash Algorithm 3 (SHA-3) [FIPS 202], CMAC [SP 800-38B] or Keccak Message Authentication Code (KMAC), Customizable SHAKE (cSHAKE), or ParallelHash [SP 800-185]. The chosen output length of the key derivation function SHOULD be the same as the length of the underlying one-way function output.
+}
+
+\begin{table}[t]
+\small
+\centering
+\caption{Overview of various key derivation functions (KDFs) or also some known as Password Hashing Functions.}
+\label{table:password_hash_comparison}
+\begin{tabular}{crccl}
+\toprule
+\textbf{Year} & \textbf{Function} & \textbf{Memory-Hard?} & \textbf{Primitive} \\
+\midrule
+1999 & \texttt{Bcrypt} \cite{provos_future-adaptable_1999} & $\times$ & Blowfish \\
+2000 & \texttt{PBKDF2} \cite{kaliski_pkcs_2000} & $\times$ & HMAC \\
+2009 & \texttt{Scrypt} \cite{percival_stronger_2009} & $\checkmark$ & Salsa20/8 \\
+2013 & \texttt{Catena} \cite{forler_catena_2013} & $\checkmark$ & Blake2b \\
+2015 & \texttt{Makwa} \cite{pornin_makwa_2015} & $\times$ & Squaring Modulo \\
+2015 & \texttt{yescrypt} \cite{neves_yescrypt_2015} & $\checkmark$ & SHA-256 \\
+2015 & \texttt{Argon2} \cite{biryukov_argon2_2016} & $\checkmark$ & Blake2b \\
+2015 & \texttt{Lyra2} \cite{andrade_lyra2_2016} & $\checkmark$ & Blake2b \\
+2016 & \texttt{Balloon} \cite{boneh_balloon_2016} & $\checkmark$ & Blake2b \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Memory-hard functions} require a large amount of memory to be computed and impose computational penalties if less memory is used. \scrypt\ is one of the first such functions to utilise this approach but suffers from two key vulnerabilities~\cite{forler2014memory}: its password-dependent memory access patterns make it susceptible to cache-timing attacks, and its memory storage approach leaves it vulnerable to garbage-collector attacks, where an adversary can bypass the memory-hardness entirely by recovering stored values after computation. Subsequent key derivation functions, designed with password hashing in mind, aimed to be simpler, resistant to side-channel attacks, and memory-hard. The Password Hashing Competition\footnote{\url{https://www.password-hashing.net/}} was an initiative to accelerate the development of such new functions.
+
+The 2015 Password Hashing Competition gave birth to a host of functions with the following selection criteria\footnote{\url{https://www.password-hashing.net/report-finalists.html}}:
+\begin{itemize}
+    \item Defense against GPU/FPGA/ASIC attackers
+    \item Defense against time-memory tradeoffs
+    \item Defense against side-channel leaks
+    \item Defense against cryptanalytic attacks
+    \item Elegance and simplicity of design
+    \item Quality of the documentation
+    \item Quality of the reference implementation
+    \item General soundness and simplicity of the algorithm
+    \item Originality and innovation
+\end{itemize}
+
+\argontwo\ was the winner of this competition which provided three variants to mitigate time-memory tradeoff attack: 1) \textit{Argon2d} maximizes resistance to GPU cracking attacks but introduces potential side-channel attacks; 2) \textit{Argon2i} is conversely optimized to resist side-channel attacks; 3) \textit{Argon2id} is a hybrid version of the two prior variants. OWASP \cite{owasp_owasp_2024} recommends using the Argon2id variant with a minimum configuration of 19 MiB of memory, 1 degree of parallelism, and 2 iteration counts. \catena, \lyratwo, \makwa, and \yescrypt\ were the runners up in this competition. \catena\ was developed to address the vulnerabilities of \scrypt by implementing password-independent memory access patterns and providing built-in protection against garbage collection attacks in its double-butterfly graph variant.
+% Additionally, \catena\ introduces novel features like client-independent updates and server relief, making it more practical for real-world password hashing applications.
+
+\balloon, developed in 2016, offers several key improvements over existing memory-hard functions like \argontwo. Unlike its predecessors that rely on heuristic security arguments, Balloon provides proven memory-hardness guarantees in the random-oracle model. Its password-independent memory access pattern prevents cache timing side-channel attacks that plague functions like \scrypt, while maintaining competitive performance. The authors demonstrate Balloon's practical advantages by showing an attack against Argon2i that allows computing it with less space than claimed, while Balloon maintains its security properties even under sophisticated analysis.
+
+\noteBox{The OWASP password storage recommendations \cite{owasp_password_2024}}{%
+\begin{itemize}
+    \item Use Argon2id with a minimum configuration of 19 MiB of memory, an iteration count of 2, and 1 degree of parallelism.
+    \item If Argon2id is not available, use scrypt with a minimum CPU/memory cost parameter of ($2^17$), a minimum block size of 8 (1024 bytes), and a parallelization parameter of 1.
+    \item For legacy systems using bcrypt, use a work factor of 10 or more and with a password limit of 72 bytes.
+    \item If FIPS-140 compliance is required, use PBKDF2 with a work factor of 600,000 or more and set with an internal hash function of HMAC-SHA-256.
+    \item Consider using a pepper to provide additional defense in depth (though alone, it provides no additional secure characteristics).
+\end{itemize}
+}
+
+
+% \argontwo, the winner of the Password Hashing Competition in 2015, is designed to resist both GPU and ASIC attacks by allowing configuration of memory usage, and CPU processing time. It is defined as follows:
+% \[ \texttt{\textbf{Argon2}}\,(\texttt{Password}, \texttt{Salt}, t, m, d, \texttt{len}) \]
+% where $t$ is the number of iterations, $m$ is the memory usage in kibibytes, $d$ is the degree of parallelism, and $\text{len}$ is the desired length of the output.
+% 
+
+
+
+
+
+%\subsection{PBKDF2}
+%PBKDF2 \cite{kaliski_pkcs_2000} applies a pseudorandom function, such as HMAC-SHA-256, to the input password along with a salt value and repeats the process many times to produce a derived key. The number of iterations, denoted as $c$, is a crucial parameter that enhances the hash's resistance to attacks. The formal definition of PBKDF2 is given by:
+%\[ DK = \texttt{PBKDF2}(\texttt{PRF}, \texttt{Password}, \texttt{Salt}, c, \texttt{dkLen}) \]
+%where $DK$ is the derived key of length $dkLen$, $PRF$ is the pseudorandom function, and $c$ is the iteration count.
+
+
+%\subsection{Argon2}
+%Argon2 \cite{biryukov_rfc_2021}, the winner of the Password Hashing Competition in 2015, is designed to resist both GPU and ASIC attacks by allowing configuration of memory usage, and CPU processing time. It is defined as follows:
+%\[ \texttt{\textbf{Argon2}}\,(\texttt{Password}, \texttt{Salt}, t, m, d, \texttt{len}) \]
+%where $t$ is the number of iterations, $m$ is the memory usage in kibibytes, $d$ is the degree of parallelism, and $\text{len}$ is the desired length of the output.
+%
+%There exist three variants of Argon2:
+%\begin{itemize}
+%    
+%\item \textbf{Argon2d} maximizes resistance to GPU cracking attacks but introduces potential side-channel attacks.
+%\item \textbf{Argon2i} is optimized to resist side-channel attacks.
+%\item \textbf{Argon2id} is a hybrid version of the two above. It follows the Argon2i approach for the first half pass over memory and the Argon2d approach for subsequent passes. OWASP \cite{owasp_owasp_2024} recommends using this variant with a minimum configuration of 19 MiB of memory, 1 degree of parallelism, and 2 iteration counts.
+%\end{itemize}
+
+
+%If Argon2id is not available, use scrypt with a minimum CPU/memory cost parameter of ($2^17$), a minimum block size of 8 (1024 bytes), and a parallelization parameter of 1.
+%For legacy systems using bcrypt, use a work factor of 10 or more and with a password limit of 72 bytes.
+%If FIPS-140 compliance is required, use PBKDF2 with a work factor of 600,000 or more and set with an internal hash function of HMAC-SHA-256.
+%Consider using a pepper to provide additional defense in depth (though alone, it provides no additional secure characteristics).
+
+%\subsection{Scrypt}
+%Scrypt \cite{percival_stronger_nodate} is a password-based key derivation function that is designed to make it costly to perform large-scale custom hardware attacks by requiring large amounts of memory. Its formal definition can be expressed as:
+%\[ DK = \text{scrypt}(Password, Salt, N, r, p, dkLen) \]
+%where $N$ is the CPU/memory cost factor, $r$ is the block size parameter, $p$ is the parallelization parameter, and $dkLen$ is the length of the derived key.
+%
+%\subsection{bcrypt}
+%bcrypt uses a variant of the Blowfish encryption algorithm and incorporates a salt to protect against rainbow table attacks. It is computationally intensive by design; its key setup phase is slow, which slows down both the attack and normal operations. It can be represented as:
+%\[ \text{bcrypt}(Cost, Salt, Input) \]
+%where $Cost$ controls the complexity of the underlying algorithm (specifically, the number of hash iterations, represented as $2^\text{Cost}$), $Salt$ is a random value, and $Input$ is the password to be hashed.
+%
+% \subsection{Preimage Attack}
+% A preimage attack, also known as a first preimage attack, is a type of cryptographic attack where an attacker attempts to find a message that produces a given hash value. In other words, given a hash value $h$, the attacker tries to find a message $m$ such that $hash(m) = h$. This attack is considered successful if the attacker can find any message that produces the given hash value.
+% Preimage attacks are computationally difficult for secure hash functions, as they are designed to be one-way functions. The complexity of a preimage attack is typically $2^n$, where $n$ is the bit length of the hash digest. For example, finding a preimage for a 256-bit hash digest would require $2^{256}$ hash computations on average, which is considered infeasible with current computing power.
+% 
+% \subsection{Birthday Attack}
+% A birthday attack, also known as a collision attack, is a type of cryptographic attack that exploits the birthday paradox to find collisions in hash functions. The birthday paradox states that in a group of 23 people, there is a 50\% probability that two people share the same birthday. Similarly, in a birthday attack, the attacker tries to find two different messages that produce the same hash digest.
+% 
+% The complexity of a birthday attack is lower than that of a pre-image attack. The number of hash computations required for a successful birthday attack is approximately $\sqrt{2^n}$, where $n$ is the bit length of the hash digest. For example, finding a collision for a 256-bit hash digest would require approximately $2^{128}$ hash computations, which is significantly less than the $2^{256}$ computations required for a pre-image attack.
+%To mitigate the risk of birthday attacks, hash functions used for cryptographic purposes, such as digital signatures and password storage, should have a sufficiently large output size. Increasing the hash digest length reduces the probability of collisions and makes birthday attacks more computationally intensive.
+
+
+
+
+\section{Identity-based Cryptosystems}
+\label{sec::chp2::identity-based-ciphers}
+
+\begin{table}[]
+    \small
+    \centering
+    \caption{Table of Identity-based cryptosystems.}
+    \label{tab:my_label}
+\begin{tabular}{cccc}
+\toprule
+\textbf{Year} & \textbf{Protocol} & & \textbf{Type} \\
+\midrule
+1984 & Shamir & \cite{shamir_identity-based_1984} & Signature \\
+1986 & Fiat--Shamir & \cite{fiat_how_1986} & Identification \\
+1988 & Feige--Fiat--Shamir & \cite{feige_zero-knowledge_1988} & Identification \\
+1988 & GQ & \cite{guillou_practical_1988} & Identification \\
+1988 & Beth & \cite{beth_efficient_1988} & Identification \\
+1990 & Schnorr & \cite{schnorr_efficient_1990} & Identification \\
+1991 & Ong--Schnorr & \cite{ong_fast_1991} & Signature \\
+1991 & Girault & \cite{girault_identity-based_1991} & Identification \\
+1993 & Okamoto & \cite{okamoto_provably_1993} & Identification \\
+2002 & Choon--Cheon & \cite{choon_identity-based_2002} & Signature \\
+2004 & Ateniese--Medeiros & \cite{ateniese_identity-based_2004} & Hash \\
+2005 & Kurosawa--Heng & \cite{kurosawa_identity-based_2005} & Identification \\
+2009 & Chin--Heng--Goi & \cite{chin_hierarchical_2009} & Identification \\
+2011 & Tan--Heng--Phan--Goi & \cite{tan_variant_2011} & Identification \\
+2020 & Chia--Chin & \cite{chia_identity_2020} & Identification \\
+\bottomrule
+\end{tabular} 
+\end{table}
+
+Identity-based cryptosystems or protocols are a type of public-key cryptography where a user's public key is derived directly from some unique identifier of the user, such as their email address, domain name, or phone number. They are \textit{challenge-response} identification protocols and are considered to be strong authentication. Challenge-response identification involves a prover (or claimant) $A$ authenticating to a verifier (or challenger) $B$. 
+
+% The drawbacks of using a public-key-based ciphers or digital signatures are its practicality, certification and trusted party requirements. Such drawbacks are mitigated in identity-based identification protocols. It essentially allows one to use one's identity (e.g.~name, date of birth, place of birth etc.) as a public-key. In such a system everyone would have access to some function \(f\). This function would allow one to compute the public-key from some string which is unique to the individual.
+
+The protocols to be discussed in this section are zero-knowledge protocols. A protocol (or proof system) has the \textit{zero-knowledge property} if it is an \textit{interactive proof system} where the verifier learns nothing beyond the validity of the assertion being proved. These \textit{interactive proof systems} have the following general structure:
+
+\begin{enumerate}
+    \item $A \rightarrow B:$ witness
+    \item $A \leftarrow B:$ challenge
+    \item $A \rightarrow B:$ response
+\end{enumerate}
+
+Adi Shamir first introduced an identity-based signature scheme in his seminal 1984 paper, ``Identity-based cryptosystems and signature schemes'' \cite{shamir_identity-based_1984}. This approach remains grounded in public-key cryptosystems but incorporates a distinctive modification. Instead of generating and publishing a traditional public key, users can utilise a set of unique personal identifiers (e.g., name, date of birth, place of birth) as a substitute for the public key. 
+
+Shamir only provides a signature implementation scheme for his identity-based system idea. Shamir returns to this idea in subsequent papers in the years following 1984. In 1986, Fiat and Shamir present the first concrete solution~\cite{fiat_how_1986}. They note that \emph{``The new identification scheme is a combination of zero-knowledge interactive proofs~\cite{goldwasser_knowledge_1985} and identity-based schemes~\cite{shamir_identity-based_1984}.''} In this paper~\cite{fiat_how_1986}, they provide both the signature and proof-of-identity scheme that Shamir proposed in his 1984 paper~\cite{shamir_identity-based_1984}. Moreover, Shamir, along with Feige and Fiat, produces a further study on \emph{``Zero-Knowledge Proofs of Identity''}~\cite{feige_zero-knowledge_1988}. This paper discusses and differentiates between zero-knowledge \emph{``proofs of membership''} and \emph{``proofs of knowledge.''}
+
+\subsection{Feige--Fiat--Shamir Identification Protocol}
+
+This is the protocol as described in \textit{``Zero Knowledge Proofs of identity''} \cite{feige_zero-knowledge_1988}. We have made some adjustments to the notation to keep it consistent throughout this dissertation. Its security depends on the intractability of computing the square roots mod n.
+
+Assuming the interaction is occurring between two entities, the \textit{prover $A$} and the \textit{verifier $B$}.
+
+\textbf{$A$'s key generation protocol is as follows:}
+
+\begin{enumerate}
+    \item Choose $k$ random numbers $S_1,...,S_k$ in $\mathbb{Z}_n$
+    \item Choose each $v_j$ (randomly and independently) as $\pm1 \cdot (S_j^2)^{-1} \mod{n}$
+    \item Publish $v_1,...,v_k$ and keep $S_1,...,S_k$ secret
+\end{enumerate}
+
+\textbf{The generation and verification process (i.e. interactions) takes place as follows through a four-step process:}
+Repeat \(t\) times:
+
+Repeat steps 3 to 6 for \(i = 1, \ldots, t\):
+
+\begin{enumerate}
+    \setcounter{enumi}{2}
+    \item $A$ picks a random \(r_i \in [0, n)\) and sends \(x_i = r_i^2 \pmod{n}\) to $B$.
+    \item $B$ sends a random binary vector \((e_{i1}, \ldots, e_{ik})\) to $A$.
+    \item $A$ sends to $B$:
+    \[
+    y_i = r_i \prod_{e_{ij}=1} s_j \pmod{n}.
+    \]
+    \item B checks that
+    \[
+    x_i \equiv y_i^2 \prod_{e_{ij}=1} v_j \pmod{n}.
+    \]
+\end{enumerate}
+
+
+In their final remarks~\cite{feige_zero-knowledge_1988}, Feige, Fiat, and Shamir note: \emph{``An interesting modification can eliminate the public key directory and lead to a key-less identification scheme.''} We use the identity string to public-key transformation provided in~\cite{feige_zero-knowledge_1988} to create public keys in the system.
+
+There are other protocols similar to the Fiat--Shamir protocol, such as the Guillou--Quisquater (GQ) identification scheme~\cite{guillou_practical_1988}, which differs by reducing the number of messages exchanged and the memory requirements for user secrets. The Schnorr identification protocol~\cite{schnorr_efficient_1990} relies on the intractability of the discrete logarithm problem, unlike the Fiat--Shamir and GQ protocols.

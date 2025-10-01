@@ -1,0 +1,57 @@
+\section{Method}
+This is a method to calculate the pre-image of a password through decomposition. This involves collecting and cleaning leaked password datasets then manually labelling the individual passwords to decompose into chunks, words, structure, and consequently tagging them. Such a detailed decomposition has been lacking in the field, where academics have crudely modelled password strings based on individual characters and chunks. The newly created labelled dataset then was used to train various machine learning models to do future password decomposition with little human intervention.
+
+\textbf{Lexical Analysis} identifies the basic components, such as letters, numbers, and special characters. \textbf{Semantic Decomposition} breaks down the password into meaningful units or words (if any), such as recognising that ``cat'' and ``dog'' are two words in the password \password{catdog123}. \textbf{Pattern Recognition} detects common patterns, including repeated characters, sequential numbers, and typical substitutions (e.g., \fun{A} $\rightarrow$ \fun{4} or \fun{E} $\rightarrow$ \fun{3}). \textbf{Structural Analysis} examines the overall composition of the password, such as the sequence of character types (e.g., letters followed by numbers or interspersed special characters). \textbf{Transformation Analysis} identifies modifications applied to parts of the password, such as leetspeak substitutions or specific capitalisation patterns.
+
+\textbf{\textsc{Data.}}\;We began by compiling a list of frequently utilised datasets from prior studies and open-source repositories, such as SecLists~\cite{miessler_danielmiesslerseclists_2024}. The datasets previously employed are open-source and readily accessible. We have concentrated on datasets predominantly in English, Spanish, and German. We selected the \hmail dataset due to its substantial size of \num{8 929}~entries, the phishing method used for its breach, and its bilingual content in English and Spanish. We also selected the \lizardsquad dataset because it was compromised in 2005 and thus represents a younger dataset compared to \hmail. Additionally, \lizardsquad is relatively small (\num{11 808}~records), making it more manageable for labelling. Common datasets such as \texttt{Rockyou}~\cite{miessler_rockyou_2009}, \texttt{phpbb}~\cite{miessler_phpbb_2009}, and \texttt{000webhost}~\cite{miessler_000webhost_2015} also emerged; however, their vast sizes exceed our capacity for manual labelling given the limited human resources available.
+
+The \hmail dataset, which leaked in 2009 \cite{johnson_hotmail_2009}, comprises 8\,929 records of passwords. Public sources indicate that these passwords were procured through phishing. Abundant evidence within the dataset supports this claim. For instance, we observe numerous passwords with inverted capitalisation and similar passwords that contain typos, suggesting that users might have unintentionally activated \texttt{CAPS\;LOCK}.
+
+\textbf{\textsc{Labelling.}}\: We segmented the 8\,929 leaked passwords based on their structural characteristics. Numeric-only passwords were excluded. The remainder was categorised into three groups: 1) Passwords following an $L_nD_n$ pattern, consisting of letters followed by digits; 2) Passwords with an $L_n$ structure, including letters and symbols; and 3) Those that did not fit the previous categories, labelled as $!L_nD_n$. We then employed the Markov n-gram entropy method to sort the passwords. This process involved semantically breaking down passwords into identifiable segments, extracting meaningful words, and then labelling the password structure based on these components. Each password received a tag reflective of its primary element—word, name, or phrase—outlined in Table \ref{table:tags}. Passwords lacking overt semantic content were designated as R2, denoting a human-generated structure that was ambiguous to the labeller. Passwords identified as machine-generated or random received an R1 tag, while those with repetitive structures or keyboard patterns were marked as R3---see Table~\ref{table:randomtags}.
+
+\begin{table}[]
+    \centering
+    \setlength\tabcolsep{6pt} % default value: 6pt
+    %{\renewcommand{\arraystretch}{0.6}% for the vertical padding
+    \caption{Labels for passwords that have a degree of randomness to them or the passwords are undecipherable to the human labeller.}
+    \label{table:randomtags}
+    \begin{tabular}{cp{9cm}}
+    \toprule
+    \textbf{Label} & \textbf{Description} \\
+    \midrule
+     R    &  Random passwords with no apparent structure.\\
+     R2   &  The password has a distinct non-random structure but we cannot decompose it into meaningful components.\\
+     R3   &  The password has a distinct repeating pattern such as \texttt{abcd123}\\
+     \bottomrule
+    \end{tabular}
+    %} %% vertical padding
+\end{table}
+
+
+\begin{table}[]
+    \centering
+    \setlength\tabcolsep{6pt} % default value: 6pt
+    %{\renewcommand{\arraystretch}{0.6}% for the vertical padding
+    \caption{Keywords used to tag and identify passwords based on their composition.}
+    \label{table:tags}
+    \begin{tabular}{clp{9cm}}
+    \toprule
+    \textbf{Serial} & \textbf{Tag} & \textbf{Description} \\
+    \midrule
+    1 & word & Standard dictionary word or common. \\
+    2 & name & Given real or fictional names. \\
+    3 & phrase & Password is composed of multiple words. \\
+    4 & location & Places such as towns, cities and countries. \\
+    5 & date & If majority of the password is made up of a date. \\
+    6 & org & Organisation \\
+    7 & object & Specific objects such as car models or artefacts. \\
+    8 & email & Email address like passwords. \\
+    9 & website & Entire string composed as a web URL \\ 
+    10 & kp & Keyboard pattern, e.g. \texttt{qwerty} \\
+    \bottomrule
+    \end{tabular}
+    %} %% vertical padding
+\end{table}
+
+\textbf{\textsc{Training.}}\;In our experiment evaluating the effectiveness of different agents (both human and machine) in labelling password strings, we fine-tuned several Large Language Models (LLMs). The GPT-3 models were fine-tuned via the OpenAI API. The LLama2 and Mistral-7B models underwent fine-tuning with the QLoRa \cite{dettmers_qlora_2023} method.
+%on a machine equipped with an AMD EPYC 7b13 64-core CPU, 256GB RAM, and two RTX 6000 Ada GPUs.

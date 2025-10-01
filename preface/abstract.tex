@@ -1,0 +1,20 @@
+\cleardoublepage
+\addcontentsline{toc}{chapter}{Abstract}
+
+\begin{abstract}
+%\onehalfspacing % only for drafting
+User secrets, such as passwords, personally identifiable information, and financial data, are increasingly vulnerable and at risk due to browser-based malware, data breaches, and password guessing attacks. Motivated by an increase in cyber crime, this dissertation explores the life cycle of these user secrets and introduces novel methods to mitigate and circumvent security threats. We examine the journey of user secrets through three main stages: password composition, client-side interaction, and server-side storage.
+
+We make three contributions with the ultimate aim of protecting user secrets on the web. Firstly, during the password composition phase, we investigate the entropy and resilience of user-generated passwords. Despite their vulnerability to exploits and inherent weaknesses that lead to many data breaches, password-based authentication systems remain prevalent. Motivated by the lack of consensus among industry experts, government agencies, and academics on password composition policy and strength, we ask if there exists a secure, human-chosen, and memorable password. To address this, we introduce the first-ever human-labelled password dataset and utilise Large Language Models to expedite the labelling process. We identify new password structures that are used to implement password strength meter.
+
+Secondly, in the client-side interaction stage, we examine the threats associated with the transmission and handling of user secrets within the browser environment. 
+We design and implement an out-of-band method, \formless, to circumvent Man-in-the-Browser malware. %This allows users to transmit credentials and other secrets even if the browser or client is compromised.
+
+Finally, we focus on the server-side security phase---the final stage in the journey of user secrets. Current research focuses on developing new hash functions that can withstand advances in hardware performance and password guessing algorithms. We explore whether identity-based cryptosystems can replace traditional hash functions for password-based authentication. Using these cryptosystems, we design and implement a password-less protocol---\deeid.
+
+It is clear that modern web authentication, dominated by password, and its trajectory of progress is unsustainable. The current stopgap approach of bolstering password weaknesses through additional layers, such as MFA, has resulted in user frustration and, paradoxically, in many cases introduced new vulnerabilities. We hope that our work will inspire a paradigm shift and encourage a bold leap towards new passwordless and usable authentication systems.
+
+\end{abstract}
+
+% \pagenumbering{roman}
+\setcounter{page}{1}

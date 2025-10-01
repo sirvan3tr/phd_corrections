@@ -1,0 +1,80 @@
+\RequirePackage{etex}
+%% USENIX
+%   \documentclass[letterpaper,twocolumn,10pt]{article}
+%   \usepackage{usenix2019}
+%-------------------------------------------------------------------------------
+%% Imperial
+%\documentclass[a4paper,12pt]{report}
+\documentclass[a4paper,12pt,twoside]{report}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=3cm]{geometry}
+
+\input{_icthesis.sty}
+%-------------------------------------------------------------------------------
+%% OX
+%   \documentclass[a4paper]{ociamthesis}
+%   % This is the official option.  Use it for your submission copy and library copy:
+%   \setlength{\textbaselineskip}{22pt plus2pt}
+%   % This is closer spacing (about 1.5-spaced) that you might prefer for your personal copies:
+%   %\setlength{\textbaselineskip}{18pt plus2pt minus1pt}
+%   % You can set the spacing here for the roman-numbered pages (acknowledgements, table of contents, etc.)
+%   \setlength{\frontmatterbaselineskip}{17pt plus1pt minus1pt}
+%   % Leave this line alone; it gets things started for the real document.
+%   \setlength{\baselineskip}{\textbaselineskip}
+%-------------------------------------------------------------------------------
+%% IEEE S&P
+%\documentclass[conference]{IEEEtran}
+%-------------------------------------------------------------------------------
+%   \documentclass[a4paper,twocolumn,10pt]{report}
+%   \usepackage{usenix2019}
+\input{_preamble}
+\addbibresource{references.bib}
+% Configure arXiv format
+\DeclareFieldFormat{eprint:arxiv}{%
+    arXiv:\space\ifhyperref
+    {\href{https://arxiv.org/abs/#1}{#1}}
+    {#1}%
+}
+%-------------------------------------------------------------------------------
+% Variables
+\newboolean{pcppapermadweb}
+\setboolean{pcppapermadweb}{false} % Set to true if you want to show the content for the Five Word PCP paper submitted to MADWEB 2025.
+%-------------------------------------------------------------------------------
+\begin{document}
+%-------------------------------------------------------------------------------
+
+\title{
+    \huge Protecting User Secrets in Hostile Environments
+    %\footnotesize \DTMnow
+}
+%
+\author{{\rm Sirvan Almasi}}
+\submitdate{February 2025}
+%
+\maketitle
+\raggedbottom
+%%%\normallinespacing
+%%%\singlespacing
+%%
+\preface
+\input{preface/copyrights}
+\input{preface/abstract}
+\input{preface/acknowledgements}
+\input{preface/dedication}
+\body
+          %\dominitoc % for minitoc
+          %\tableofcontents % for minitoc
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\onehalfspacing % only for drafting
+% Chapters
+\include{chapters/01_introduction}
+\include{chapters/02_background}
+\include{chapters/03_breaches}
+\include{chapters/why_passwords/why_passwords}
+\include{chapters/how_passwords/how_passwords}
+\include{chapters/deeid}
+\include{chapters/forml3ss}
+\include{chapters/conclusion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\printbibliography
+\end{document}
+

@@ -1,0 +1,14 @@
+\section{PRINCE Algorithm}
+The PRINCE algorithm \cite{princeprocessor2015} (\textbf{PR}obability \textbf{IN}finite \textbf{C}hained \textbf{E}lements''), is a password guessing algorithm when given an input wordlist $W$ and a target length $n$, the algorithm generates password candidates through permuted combinations. The algorithm was introduced by Jens Steube in 2014.
+
+Key features of the PRINCE algorithm include:
+
+\begin{itemize}[leftmargin=11pt]
+    \item Chain-based approach: PRINCE uses a chain-based method to generate password candidates. It starts with a word from a dictionary and applies various transformations (such as capitalization, leet speak, and appending numbers) to create a chain of password candidates.
+    
+    \item Probability-based ordering: The algorithm assigns probabilities to each transformation based on their likelihood of being used in real-world passwords. This allows PRINCE to prioritize more probable password candidates, increasing the chances of cracking the password quickly.
+    
+    \item Infinite length chains: PRINCE can generate password candidates of any length by recursively applying transformations to the base words, creating an infinite number of possible candidates.
+    
+    \item Optimized performance: The algorithm is designed to be highly optimized for modern hardware, taking advantage of GPU acceleration to perform rapid password cracking.
+\end{itemize}

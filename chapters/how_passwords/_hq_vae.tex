@@ -1,0 +1,254 @@
+\section{Diffusion Framework for Password Completion}
+
+\subsection{Theoretical Foundation}
+The diffusion framework introduces a principled approach to generative modeling through a gradual noise-to-signal process. For password completion, we work in a discrete character space $\mathcal{V}^L$ where $\mathcal{V}$ is our vocabulary and L is the password length. The forward diffusion process gradually corrupts the data by replacing characters with random ones according to a schedule $\beta_t$. Formally, at each timestep t, the transition probability is:
+
+$$q(x_t|x_{t-1}) = (1-\beta_t)\mathbb{I}(x_t = x_{t-1}) + \beta_t\text{Uniform}(\mathcal{V})$$
+
+This creates a Markov chain $x_0 \rightarrow x_1 \rightarrow ... \rightarrow x_T$ where $x_0$ is our original password and $x_T$ is nearly random. The crucial insight is that this process is reversible, and we can train a neural network to learn the reverse transitions $p_\theta(x_{t-1}|x_t)$. For password completion, this means we can start with a partially masked password and gradually denoise it to reveal plausible completions.
+
+\subsection{Mathematical Advantages for Password Generation}
+The diffusion framework provides several key mathematical advantages for password completion. First, unlike traditional autoregressive models that generate passwords left-to-right, diffusion models can complete multiple masked positions simultaneously while maintaining consistency. The reverse process probability can be expressed as:
+
+$$p_\theta(x_{t-1}|x_t) = \frac{p_\theta(x_t|x_{t-1})p(x_{t-1})}{p(x_t)}$$
+
+where $p_\theta$ is parameterized by our CNN-LSTM network. This formulation allows us to sample from the posterior distribution of possible completions, leading to more diverse and realistic passwords. The loss function for training becomes:
+
+$$\mathcal{L} = \mathbb{E}_{t,x_0,\epsilon}[\|\epsilon - \epsilon_\theta(x_t, t)\|^2]$$
+
+where $\epsilon_\theta$ predicts the noise component at each timestep. This objective naturally handles the uncertainty in password completion by learning the entire distribution of possible completions rather than just the most likely one.
+
+\subsection{Relationship to Password Structure}
+The diffusion framework is particularly well-suited for password modeling due to the inherent structure of passwords. Let $p(x)$ be the true distribution of passwords. We can decompose this into a product of conditional probabilities:
+
+$$p(x) = \prod_{i=1}^L p(x_i|x_{<i}, x_{>i})$$
+
+The diffusion process allows us to learn these complex dependencies through the gradual denoising process. At each timestep t, the model learns:
+
+$$p_\theta(x_{t-1}|x_t) \approx \prod_{i \in \mathcal{M}} p(x_i|x_{\neg i}, t)$$
+
+where $\mathcal{M}$ is the set of masked positions and $x_{\neg i}$ represents all positions except i. This formulation is particularly powerful because:
+
+1. It captures the dependency structure between characters in passwords through the joint distribution
+2. The gradual denoising process allows the model to learn both local and global password patterns
+3. The stochastic nature of the process enables sampling diverse completions that respect password conventions
+
+\subsection{Mathematical Advantages Over Alternative Approaches}
+Unlike autoregressive models which factorize the probability as $$p(x) = \prod_{i=1}^L p(x_i|x_{<i})$$, or masked language models which predict all masked tokens independently, the diffusion framework offers several advantages:
+
+$$p_\text{diffusion}(x_\text{masked}|x_\text{observed}) = \int_{x_T} \prod_{t=1}^T p_\theta(x_{t-1}|x_t)dx_T$$
+
+This formulation allows for:
+1. Iterative refinement through the denoising steps
+2. Joint prediction of masked positions while maintaining consistency
+3. Natural handling of uncertainty through the stochastic process
+4. Better capture of complex character dependencies through the gradual denoising
+
+The variational lower bound of the log-likelihood can be written as:
+
+$$\log p_\theta(x_0) \geq \mathbb{E}_{q(x_{1:T}|x_0)}\left[\log \frac{p_\theta(x_{0:T})}{q(x_{1:T}|x_0)}\right]$$
+
+This objective ensures that the model learns a rich distribution over possible completions, making it ideal for generating multiple plausible password candidates.
+
+\section{Model Architecture and Mathematical Justification}
+
+\subsection{Overview}
+The proposed architecture combines Convolutional Neural Networks (CNNs) and Long Short-Term Memory (LSTM) networks within a diffusion framework for password completion. This hybrid approach leverages both local character patterns and long-range dependencies in password structures.
+
+\subsection{Architecture Components}
+
+\subsubsection{Embedding Layer}
+The input password characters $$x \in \mathbb{Z}^{L}$$ (where L is the password length) are first embedded into a continuous space:
+
+$$E(x) = W_e x + P$$
+
+where $W_e \in \mathbb{R}^{d \times |V|}$ is the embedding matrix (|V| being vocabulary size), and P is the learned positional encoding.
+
+\subsubsection{Time Embedding}
+The diffusion timestep t is embedded using:
+
+$$\tau(t) = W_2\sigma(W_1t)$$
+
+where $W_1 \in \mathbb{R}^{d \times 1}$, $W_2 \in \mathbb{R}^{d \times d}$, and $\sigma$ is the SiLU activation function. This enables the model to condition on the noise level during denoising.
+
+\subsubsection{Convolutional Layers}
+The CNN component consists of L layers of 1D convolutions:
+
+$$h_l = \text{Conv1D}(h_{l-1}) + h_{l-1}$$
+
+with each convolution operation defined as:
+
+$$\text{Conv1D}(h) = W * h + b$$
+
+where * denotes the convolution operator with kernel size k=3. This captures local character patterns and n-gram-like features within passwords.
+
+\subsection{Mathematical Justification}
+
+\subsubsection{Local Pattern Recognition}
+Passwords often contain common local patterns (e.g., "123", "pwd", "admin"). The CNN layers with kernel size 3 create a receptive field that grows with depth:
+
+$$\text{Receptive Field Size} = 1 + 2\sum_{i=1}^{L} (k_i - 1)$$
+
+This allows the model to capture increasingly larger n-gram patterns, which is crucial for password structure learning.
+
+\subsubsection{Sequential Dependencies}
+The bidirectional LSTM processes the sequence in both directions:
+
+$$\vec{h_t} = \text{LSTM}_f(x_t, \vec{h_{t-1}})$$
+$$\overleftarrow{h_t} = \text{LSTM}_b(x_t, \overleftarrow{h_{t+1}})$$
+$$h_t = [\vec{h_t}; \overleftarrow{h_t}]$$
+
+This captures long-range dependencies and ensures that each position has access to both left and right context, which is essential for password completion.
+
+\subsubsection{Diffusion Process}
+The diffusion process operates in the discrete character space with transition probability:
+
+$$q(x_t|x_{t-1}) = (1-\beta_t)I + \beta_t U$$
+
+where $\beta_t$ is the noise schedule, I is the identity matrix, and U is the uniform distribution over the vocabulary. This allows for controlled noise injection during training and structured denoising during inference.
+
+\subsection{Advantages for Password Completion}
+
+\subsubsection{Pattern Recognition}
+The CNN layers excel at identifying common password patterns:
+\begin{itemize}
+    \item Character substitutions (e.g., "a" → "@")
+    \item Common numerical suffixes
+    \item Repeated character sequences
+\end{itemize}
+
+\subsubsection{Context Understanding}
+The bidirectional LSTM enables:
+\begin{itemize}
+    \item Long-range character dependencies
+    \item Understanding of password structure
+    \item Context-aware completion
+\end{itemize}
+
+\subsubsection{Probabilistic Sampling}
+The diffusion framework provides:
+\begin{itemize}
+    \item Controlled noise injection during training
+    \item Temperature-based sampling diversity
+    \item Multiple plausible completions for masked positions
+\end{itemize}
+
+\subsection{Mathematical Properties}
+
+The architecture guarantees several important properties:
+
+\begin{enumerate}
+    \item \textbf{Permutation Invariance}: The CNN layers are position-aware through positional encodings, ensuring the model can learn position-dependent patterns.
+    
+    \item \textbf{Information Flow}: The bidirectional nature of the LSTM ensures that for any position i:
+    $$\frac{\partial h_i}{\partial x_j} \neq 0 \quad \forall j \in [1,L]$$
+    allowing gradients to flow between any pair of positions.
+    
+    \item \textbf{Capacity Scaling}: The model's capacity scales with password length L:
+    $$\text{Parameters} \approx O(d^2 + |V|d + Ld)$$
+    where d is the model dimension.
+\end{enumerate}
+
+\subsection{Time Complexity}
+
+The computational complexity for a password of length L is:
+$$O(L \cdot d^2)$$ for the CNN layers and $$O(L \cdot d^2)$$ for the LSTM, making it more efficient than the original transformer-based approach which has complexity $$O(L^2 \cdot d)$$.
+
+\subsection{Conclusion}
+This architecture combines the strengths of CNNs (local pattern recognition), LSTMs (sequential understanding), and diffusion models (controlled generation) in a mathematically principled way. The result is a model particularly well-suited for password completion, capable of learning both local patterns and long-range dependencies while maintaining computational efficiency.
+
+\section{Markov MCTS Mask Attack}
+Given a state, select a position that is masked to do the search.
+
+
+
+\section{Hierarchical VAE for Partially Masked Password Guessing}
+\begin{figure}
+    \centering
+\begin{tikzpicture}[
+    scale=0.8,  % Scales everything to 70% of original size
+    transform shape,  % This ensures node contents are also scaled
+    node distance=0.5cm,
+    box/.style={
+        rectangle,
+        draw,
+        minimum width=2cm,
+        minimum height=1.5cm,
+        align=center,
+        rounded corners=2pt
+    },
+    encoder/.style={
+        box,
+        fill=green!10
+    },
+    decoder/.style={
+        box,
+        fill=blue!10
+    },
+    input/.style={
+        box,
+        fill=gray!10
+    },
+    embedding/.style={
+        box,
+        fill=orange!10
+    },
+    latent/.style={
+        box,
+        fill=red!10
+    },
+    arrow/.style={
+        ->,
+        thick,
+        >=stealth
+    }
+]
+
+% Input and Embedding
+\node[input] (input) {Input Password\\$x \in \mathbb{Z}^{b \times l}$};
+\node[embedding, right=of input] (embedding) {Embedding\\$E(x) \in \mathbb{R}^{b \times l \times d}$};
+
+% Encoders
+\node[encoder, above right=1cm and 1cm of embedding] (struct_enc) {Structure Encoder\\$T_1(E(x)) \rightarrow z_1$\\$z_1 \in \mathbb{R}^{b \times 256}$};
+\node[encoder, right=1cm of embedding] (pattern_enc) {Pattern Encoder\\$T_2(E(x)) \rightarrow z_2$\\$z_2 \in \mathbb{R}^{b \times 128}$};
+\node[encoder, below right=1cm and 1cm of embedding] (char_enc) {Character Encoder\\$T_3(E(x)) \rightarrow z_3$\\$z_3 \in \mathbb{R}^{b \times 64}$};
+
+% Latent Space Combination
+\node[latent, right=1cm of pattern_enc] (latent) {Combined Latent\\$z = [z_1;z_2;z_3]$\\$z \in \mathbb{R}^{b \times 448}$};
+
+% Decoders
+\node[decoder, above right=1cm and 1cm of latent] (struct_dec) {Structure Decoder\\$D_1(z) \rightarrow \hat{y}_1$\\$\hat{y}_1 \in \mathbb{R}^{b \times l \times v}$};
+\node[decoder, right=1cm of latent] (pattern_dec) {Pattern Decoder\\$D_2(z) \rightarrow \hat{y}_2$\\$\hat{y}_2 \in \mathbb{R}^{b \times l \times v}$};
+\node[decoder, below right=1cm and 1cm of latent] (char_dec) {Character Decoder\\$D_3(z) \rightarrow \hat{y}_3$\\$\hat{y}_3 \in \mathbb{R}^{b \times l \times v}$};
+
+% Connections
+\draw[arrow] (input) -- (embedding);
+\draw[arrow] (embedding) -- (struct_enc);
+\draw[arrow] (embedding) -- (pattern_enc);
+\draw[arrow] (embedding) -- (char_enc);
+\draw[arrow] (struct_enc) -- (latent);
+\draw[arrow] (pattern_enc) -- (latent);
+\draw[arrow] (char_enc) -- (latent);
+\draw[arrow] (latent) -- (struct_dec);
+\draw[arrow] (latent) -- (pattern_dec);
+\draw[arrow] (latent) -- (char_dec);
+
+% Legend
+% \node[below=2cm of input, align=left] (legend) {
+%     \begin{tabular}{ll}
+%         $b$: batch size & $l$: sequence length\\
+%         $d$: embedding dimension & $v$: vocabulary size
+%     \end{tabular}
+% };
+
+% Title
+% \node[above=0.5cm of input] {\Large Password Model Architecture};
+
+\end{tikzpicture}
+    \caption{Model Architecture}
+    \label{fig:hvae-architecture}
+\end{figure}
+This section presents a novel approach to password analysis using a multi-decoder variational autoencoder (VAE) architecture. The model incorporates structural, pattern-based, and character-level understanding of passwords through a specialized hierarchical latent space representation as shown in \ref{fig:hvae-architecture}.
+
+[to be continued...]
+

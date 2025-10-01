@@ -1,0 +1,85 @@
+\pagestyle{plain}
+\title{Five Word Password Composition Policy}
+
+\author{\IEEEauthorblockN{Sirvan Almasi}
+	\IEEEauthorblockA{Imperial College London\\
+		sirvan.almasi17@imperial.ac.uk},
+	\and
+	\IEEEauthorblockN{William J.\,Knottenbelt}
+	\IEEEauthorblockA{Imperial College London\\
+        w.knottenbelt@imperial.ac.uk}
+}
+
+
+\IEEEoverridecommandlockouts
+\makeatletter\def\@IEEEpubidpullup{6.5\baselineskip}\makeatother
+\IEEEpubid{\parbox{\columnwidth}{
+    {\fontsize{7.5}{7.5}\selectfont Workshop on Measurements, Attacks, and Defenses for the Web (MADWeb) 2025\\
+    28 February 2025, San Diego, CA, USA\\
+    ISBN 979-8-9894372-9-0\\
+    https://dx.doi.org/10.14722/madweb.2025.23020\\
+    www.ndss-symposium.org}
+}
+\hspace{\columnsep}\makebox[\columnwidth]{}}
+
+
+\maketitle
+
+\begin{abstract}
+Password composition policies (PCPs) are critical security rules that govern how users create passwords for online authentication. Despite passwords remaining the primary authentication method online, there is significant disagreement among experts, regulatory bodies, and researchers about what constitutes effective password policies. This lack of consensus has led to high variance in PCP implementations across websites, leaving both developers and users uncertain. Current approaches lack a theoretical foundation for evaluating and comparing different password composition policies. We show that a structure-based policy, such as the three-random words recommended by UK's National Cyber Security Centre (NCSC), can improve password security. We demonstrate this using an empirical evaluation of labelled password datasets and a new theoretical framework. Using these methods we demonstrate the feasibility and security of multi-word password policy and extend the NCSC's recommendation to five words to account for non-uniform word selection. These findings provide an evidence-based framework for password policy development and suggest that current web authentication systems should adjust their minimum word requirements upward while maintaining usability.
+\end{abstract}
+
+\section{Introduction}
+
+The lack of consensus on password composition policy (PCP) and the lack of adoption of best practices on the web~\cite{alroomi_measuring_2023, lomchan_comparison_2023, lim_evaluating_2023, maoneke_password_2019, furnell_assessing_2011, woo_survey_2018, lee_password_2022, gerlitz_please_2021} suggests that our knowledge on password security is not yet complete. Although passwords remain the main method of authentication, experts and regulatory bodies disagree fundamentally about what makes a good password policy. State agencies recommend one set of rules, while professional organisations suggest another, and academic researchers advocate for yet different approaches. This lack of consensus reveals a troubling gap in our understanding of password security. What password composition rules should web developers implement to best protect their users?
+
+National organisations such as NIST~(US)~\cite{nist2024} and NCSC~(UK)~\cite{ncsc2024} provide similar guidance on PCP, UK's NCSC additionally recommends minimum of three word password structure. This paper is most interested in structure related policies to enhance user secret security--should a system or web admin recommend such three word password structure policies? In this paper, we develop a model that allows us to reason analytically about PCPs. Using this, we tackle the PCP recommended by the UK's NCSC (minimum of three random words). We present a novel theoretical framework for analysing password composition policies, bridging the gap between security requirements and user behaviour.
+
+The gap between research and practice compounds the inconsistency in the PCP recommendation. Consider Dropbox, which developed \zxcvbn Password Strength Meter (PSM). Despite creating this tool, which has 14.7K Github stars and has been validated by independent research~\cite{wang_no_2023}, Dropbox's own web authentication policy contradicts current best practices. Their website requires passwords with a minimum of eight characters, one letter, one digit, and one symbol. Even more concerning, they do not appear to use their own PSM. \zxcvbn has some weaknesses; it awards its maximum score of 4/4 to \password{girlsruledaworld} and a strong 3/4 to \password{asdf1fdsa1}---passwords that we would consider vulnerable as they are common phrases or sequences.
+
+\textbf{\textsc{Threat Scenario.}} We assume that some users will choose memorable passwords, eschewing password managers or WebAuthn alternatives. Although password managers offer stronger security, our model addresses the reality that many users, from a broad population, will rely on human-generated passwords. Passwords are also useful in offline and air-gapped systems too where out-of-band systems are limited. Therefore, system and web admins have to consider such scenarios. We therefore analyse password security against the most challenging threat model: an offline attack where adversaries can make unlimited guessing attempts without rate limiting.
+\vspace*{0.25cm}
+
+\textbf{\textsc{Our Contributions are as Follows:}}
+\begin{itemize}
+    \item Empirical validation of a structure-based password policy in addition to existing policies. This provides quantitative support for existing password composition recommendations, particularly the NCSC's three-word policy
+    \item A formal mathematical model describing the recommended number of words to mitigate user behaviours such as choosing words from a non-uniform distribution.
+\end{itemize}
+
+\vspace*{0.25cm}
+
+This work addresses core areas of web security, and our results provide actionable insights for improving password policies across web platforms while maintaining usability. Our findings and insights provide immediate applications for system and web admins. Our work also provides a theoretical and reasoning basis for future password composition policy development and research.
+
+\newpage
+\section{Background}
+\label{sec::chp4::background}
+
+\textbf{\textsc{Password\;Strength.}}\;This metric measures the difficulty of guessing or cracking a password. However, there is no consensus on how to quantify such difficulty. Some experts use dictionary-based methods, while others rely on probabilistic deep-learning based approaches. Nonetheless, certain lower-bound measures are widely accepted, such as the minimum number of characters required to prevent brute-force attacks.
+
+Shannon's entropy (Eq. \ref{eq:entropy}) quantifies the uncertainty or information content associated with a random variable. \begin{equation}\label{eq:entropy}
+H(X) = -\sum_{x\in\mathcal{X}}^{} p(x) \log p(x)
+\end{equation} In the context of password strength, it measures how unpredictable or "random" a password is. The higher the entropy, the more difficult the password is to guess, making it stronger. This metric estimates the minimum number of bits required to encode the password. However, the entropy measure for passwords is often given in the form of $\log_2(R^L)$, where $R$ represents the total number of characters in the character sets used in the password, and $L$ is the length of the password.
+
+The limitation of $\log_2(R^L)$ is that it assumes all $R$ characters are equally likely, disregarding the dependency between characters in human-chosen passwords. This approach oversimplifies, as passwords like \password{8zm!U6gNL\%} and \password{p4\$sW0rd1!} are calculated to have the same entropy. However, such an assumption is unrealistic, as the latter password is essentially the word \textit{password} with predictable transformations.
+
+\textbf{\textsc{Password Composition Policies (PCP).}}\: PCP is set of rules, often in natural language, that only allows the user to sample from a password space that is assumed to be resistant to guessing attacks. The \textit{National Cyber Security Centre (NCSC)}~\cite{ncsc2024} in the UK and the \textit{National Institute of Standards and Technology (NIST)}~\cite{nist2024} in the USA are leading authorities in cyber-security. Their recommendations, particularly on password policies, should serve as standards or benchmarks in the field. Specifically, the NCSC advocates for the use of three random words~\cite{McCormackthreerandom} and advises against mandatory password complexity requirements~\cite{password_policy_ncsc}. This approach, detailed in~\cite{Kate_2021}, is based on the principle that a sequence of three random words is both easier for users to remember and sufficiently complex to deter unauthorised access, striking a balance between security and user convenience. This three word and structure-based PCP is conditioned on the following:
+
+\begin{itemize}[itemsep=0pt, parsep=0pt, leftmargin=11pt]
+    \item \textsc{\textbf{Length}}. To satisfy the minimum length requirements.
+    \item \textsc{\textbf{Impact}}. Easy to adopt and understand.
+    \item \textsc{\textbf{Novelty}}. Unlikely to find it in a breached database.
+    \item \textsc{\textbf{Usability}}. More likely to be remembered.
+\end{itemize}
+\label{jmp::chp4::ncsc-pcp}
+
+NIST's \cite{Grassi_Garcia_Fenton_2020} PCP is as follows. Passwords should have a minimum length of 8 characters, but systems should support more than 64 characters. It is advised to compare the selected password against prior breach data, dictionary entries, and repetitive patterns. Context-specific terms should also be considered. Additionally, users should be aided with strength meters to gauge password robustness. While rate limiting should be enforced during authentication attempts, use of specific composition rules is discouraged.
+OWASP \cite{owasp_owasp_2024} follows the recommendations set by NIST.
+
+\textbf{\textsc{passwordNinja Dataset \cite{almasi2024passwordninja}}} is a human and machine labelled datasets that has decomposed password strings into its finer constituents. For example, the password \password{0rwell1984} would be structured as follows.
+\[
+\begin{aligned}
+& \underbrace{\text{\password{0rwell}}}_{\text{word }(w)} \underbrace{\text{\password{1984}}}_{\text{date}} \\[10pt]
+\end{aligned}
+\vspace*{-0.3cm}
+\]
+The \fun{passwordNinja}~\cite{almasi2024passwordninja} dataset is composed of a complete \hmail and \lizardsquad breached passwords from 2009 and 2015 respectively. The \hmail dataset, which leaked in 2009~\cite{johnson_hotmail_2009}, comprises \num{8929} records of passwords. Public sources indicate that these passwords were procured through phishing. Abundant evidence within the dataset supports this claim. For instance, we observe numerous passwords with inverted capitalisation and similar passwords that contain typos, suggesting that users might have unintentionally activated \texttt{CAPS\;LOCK}. The \lizardsquadnocite dataset contains \num{11808} records.

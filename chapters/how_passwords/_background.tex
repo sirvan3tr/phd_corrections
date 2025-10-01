@@ -1,0 +1,24 @@
+\section{Background}
+\label{chp5::sec::background}
+
+The concept of computer passwords was first introduced in the 1960s with the Compatible Time-Sharing System (CTSS) at MIT. However, it wasn't until 1979 that dictionary attacks were first discussed by Robert Morris and Ken Thompson in their paper "Password security: a case history" [1]. They also proposed the first example of password rules to enhance security.
+
+In the early days of password cracking, tools like Crack, released by Alec Muffet in 1992, performed dictionary attacks against Unix passwords using lists of commonly used passwords, demonstrating the vulnerability of weak password practices. In 1989-1992, Klein [2][3] conducted a study where he ran dictionary attacks against a set of ~15,000 encrypted passwords contributed by volunteers. Using a dictionary of approximately 62,000 words, Klein successfully cracked around 39% of the passwords.
+
+As technology advanced, more sophisticated tools emerged. In 2003, Philippe Oechslin released RainbowCrack, which implemented rainbow tables to crack passwords efficiently. Rainbow tables are precomputed tables that store the hashes of plaintext passwords, allowing for faster password cracking. In 2009, oclHashcat was released, leveraging the power of GPUs to significantly increase the speed of password cracking.
+
+With the increasing adoption of the internet and web applications from 2010 onwards, data breaches and cyber crimes became more prevalent, resulting in a larger number of passwords being leaked into the wild. This abundance of real-world password data has facilitated the development of more advanced password guessing techniques.
+
+Password guessing techniques have evolved alongside progress in deep learning and other machine learning methods. However, the utilization of powerful hardware, such as GPUs, has proven to be more effective in practice, leading to a widening gap between industry and academia in terms of password cracking capabilities.
+
+To combat the growing threats to password security, various countermeasures have been developed. Salting, which involves appending a unique random value to each password before hashing, helps prevent attacks using precomputed tables like rainbow tables. Key derivation functions, such as PBKDF2, bcrypt, scrypt, and Argon2, have been designed to slow down the password cracking process by increasing the computational cost of hash calculations.
+
+Several software tools have been developed to assist in password cracking and security testing. Hashcat, originally released as a CPU-based tool for cracking WPA/WPA2 protocols and later made open-source in 2015, has become one of the most popular password cracking tools. John the Ripper (JtR), designed by Alexander Peslyak to detect weak Unix passwords, is another widely used tool. Other notable tools include Aircrack-ng, primarily used for Wi-Fi protocols; Cain \& Abel; Ophcrack; THC Hydra; L0phtCrack; and Medusa.
+
+Mathematically, the password cracking process can be represented as follows:
+
+Let $P$ be the set of all possible plaintext passwords, and $H$ be the set of corresponding password hashes. The goal of password cracking is to find a function $f: H \rightarrow P$ that maps a given password hash $h \in H$ to its original plaintext password $p \in P$, such that $hash(p) = h$.
+
+The efficiency of password cracking techniques can be measured by the number of guesses required to find the correct password, denoted as $G$. The objective is to minimize $G$ by using various strategies, such as dictionary attacks, rule-based attacks, and probabilistic models, to prioritize the most likely password candidates.
+
+In summary, the history of password guessing has been shaped by the interplay between advancements in technology, the increasing availability of password data, and the development of countermeasures. As the field continues to evolve, it is crucial to stay informed about the latest techniques and best practices in password security to protect against emerging threats.

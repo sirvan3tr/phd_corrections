@@ -1,0 +1,157 @@
+\setlength\dashlinedash{0.2pt}
+\setlength\dashlinegap{1.5pt}
+\setlength\arrayrulewidth{0.4pt}
+
+
+\begin{table*}
+\scriptsize
+\centering
+\caption{Analysis of 60 open source reports of data breaches and web attacks categorised based on method of attack.}
+\label{table:main}
+    \setlength\tabcolsep{3pt} % default value: 6pt
+    {\renewcommand{\arraystretch}{0.8}% for the vertical padding
+\begin{tabular}{rlp{1cm}cccccl}
+\toprule
+\rowcolor{white}
+& & & & \multicolumn{2}{c}{\textbf{Incident Date}} & & \\
+& Victim & Records & Data & From & To & News Date & Src \\
+\toprule
+\multicolumn{2}{l}{ \textbf{Credential Stuffing Attack} } & & & & & \multicolumn{2}{c}{ Total: 4 } \\
+\hline
+1 & US--\textbf{J.CREW} & n/a & PII, \$, Sensitive activity & n/a & Apr '19 & Mar & \cite{whittaker_jcrew_2020} \\
+\hdashline
+2 & US--\textbf{Amtrak} & n/a & PII & n/a & Apr & Jun & \cite{osborne_amtrak_2020,mares_amtrak_2020} \\
+\hdashline
+3 & US--\textbf{Spotify} & 0.30 & PII & n/a & Nov & Nov & \cite{moore_thousands_2020} \\
+\hdashline
+4 & US--\textbf{Zoom} & 0.50 & PII & n/a & Apr & Apr & \cite{abrams_over_2020} \\
+\hdashline
+\multicolumn{2}{l}{ \textbf{Man-in-the-Browser} } & & & & & \multicolumn{2}{c}{ Total: 7 } \\
+\hline
+5 & US--\textbf{Warner Music Group} & n/a & PII, \$ & Apr & Aug & Sept & \cite{broersma_warner_2020} \\
+\hdashline
+6 & GB--\textbf{Sweaty Betty} & n/a & PII, \$ & Nov '19 & Nov '19 & Dec '19 & \cite{noauthor_sweaty_2019,abrams_uk_2019} \\
+\hdashline
+7 & US--\textbf{Claire's} & n/a & PII, \$ & Apr & Jun & Jun & \cite{sandle_claires_2020} \\
+\hdashline
+8 & US--\textbf{Boom! Mobile} & n/a & PII, \$ & n/a & Oct & Oct & \cite{osborne_boom_2020} \\
+\hdashline
+9 & US--\textbf{Hanna Andersson} & 0.20 & PII, \$ & 09 '19 & 11 '19 & Jan & \cite{de_la_torre_hanna_2020,towsend_hanna_2020} \\
+\hdashline
+10 & US--\textbf{JM Bullion} & n/a & PII & Feb & Jul & Nov & \cite{kovacs_gold_2020} \\
+\hdashline
+11 & US--\textbf{San Francisco Int Airport} & n/a & Auth & n/a & Apr & Apr & \cite{abhliash_breaking_2020} \\
+\hdashline
+12 & \textbf{Cardbleed - Int} & n/a & PII, Auth, \$ & Sept & Sept & Sept & \cite{team_sansec_cardbleed_2020} \\
+\hdashline
+\multicolumn{2}{l}{ \textbf{Phishing} } & & & & & \multicolumn{2}{c}{ Total: 5 } \\
+\hline
+13 & US--\textbf{Tufts Health Plan \& EyeMed} & 0.06 & PII & July & Nov & Dec & \cite{noauthor_tufts_nodate} \\
+\hdashline
+14 & US--\textbf{Twitter} & 130 Accounts & Auth, Msg & n/a & Aug & Aug & \cite{noauthor_teen_2020} \\
+\hdashline
+15 & US--\textbf{Imperium Health} & 0.14 & PII, PHI & Apr & Apr & Sept & \cite{hippa_journal_phi_2020} \\
+\hdashline
+16 & US--\textbf{Ambry Genetics} & 0.23 & PII & Jan & Jan & Apr & \cite{bizga_medical_2020} \\
+\hdashline
+17 & US--\textbf{Beaumont Health} & 0.12 & PII, Health & May & Jun & Jul & \cite{noauthor_6000_2020} \\
+\hdashline
+\multicolumn{2}{l}{ \textbf{Ransomware} } & & & & & \multicolumn{2}{c}{ Total: 3 } \\
+\hline
+18 & US--\textbf{Magellan Health} & 1.70 & PII, Auth & Apr & Apr & May & \cite{davis_ransomware_2020} \\
+\hdashline
+19 & DE--\textbf{Fresenius Group} & n/a & System & n/a & May & May & \cite{krebs_europes_2020} \\
+\hdashline
+20 & US--\textbf{Barnes \& Noble} & n/a & PII, Sensitive activity & n/a & Oct & Oct & \cite{abrams_barnes_2020} \\
+\hdashline
+\multicolumn{2}{l}{ \textbf{Unknown} } & & & & & \multicolumn{2}{c}{ Total: 10 } \\
+\hline
+21 & US--\textbf{Drizly} & 2.50 & PII, \$ & n/a & Feb & Jul & \cite{whittaker_alcohol_2020} \\
+\hdashline
+22 & US--\textbf{Quidd} & 4.00 & PII, Auth & n/a & Oct & Mar & \cite{noauthor_nearly_2020} \\
+\hdashline
+23 & US--\textbf{MGM Resorts} & 142 & PII & n/a & Jul & Jul & \cite{noauthor_mgm_2020} \\
+\hdashline
+24 & JP--\textbf{Nintendo - JP} & 0.30 & PII, \$ & n/a & Apr & Jun & \cite{liao_nintendo_2020} \\
+\hdashline
+25 & US--\textbf{Dental Care Alliance} & 1.00 & PII, Sensitive info & Sept & Oct & Dec & \cite{noauthor_dental_2020} \\
+\hdashline
+26 & US--\textbf{Wishbone} & 40.00 & PII, Auth & Jan & May & May & \cite{cimpanu_hacker_2020} \\
+\hdashline
+27 & HR--\textbf{Mathway} & 25.00 & PII, Auth & n/a & Jan & May & \cite{cimpanu_25_2020} \\
+\hdashline
+28 & US--\textbf{Minted} & 5.00 & PII, Auth & May & May & May & \cite{abrams_minted_2020} \\
+\hdashline
+29 & US--\textbf{Chowbus} & 0.80 & PII, & n/a & Oct & Oct & \cite{abrams_chowbus_2020} \\
+\hdashline
+30 & GB--\textbf{EasyJet} & 9.00 & PII, \$ & April & April & May & \cite{wakefield_easyjet_2020} \\
+\hdashline
+\multicolumn{2}{l}{ \textbf{Unsecured Database} } & & & & & \multicolumn{2}{c}{ Total: 19 } \\
+\hline
+31 & US--\textbf{Pray.com} & 10.00 & PII, Sensitive activity & n/a & n/a & Nov & \cite{seals_good_2020} \\
+\hdashline
+32 & US--\textbf{Paay} & 2.50 & Payment Info & Apr & Apr & Apr & \cite{riley_25m_2020} \\
+\hdashline
+33 & US--\textbf{Clubillion} & >1 & PII, Activity & n/a & Apr & Apr & \cite{noauthor_report_2020} \\
+\hdashline
+34 & NL--\textbf{Pfizer (EMA)} & n/a & Docs & n/a & n/a & Dec & \cite{noauthor_pfizerbiontech_2020} \\
+\hdashline
+35 & US--\textbf{Estee Lauder} & 440 & PII, Activity & n/a & Jan & Feb & \cite{paganini_440m_2020} \\
+\hdashline
+36 & US--\textbf{Whisper} & 900 & PII & 2012 & Mar & Mar & \cite{osborne_whisper_2020} \\
+\hdashline
+37 & US--\textbf{MyCastingFile.com} & 0.26 & PII, Sensitive info & n/a & Apr & Jul & \cite{osborne_us_2020} \\
+\hdashline
+38 & US--\textbf{PhotoSquared} & 0.10 & PII, Sensitive info & Nov & Jan & Feb & \cite{muncaster_photosquared_2020} \\
+\hdashline
+39 & US--\textbf{Ancestry.com} & 0.06 & PII, Sensitive info & n/a & Jul & Jul & \cite{montalbano_leak_2020} \\
+\hdashline
+40 & MY--\textbf{123RF} & 8.30 & PII, Auth & n/a & Oct & Nov & \cite{noauthor_hackers_2020} \\
+\hdashline
+41 & US--\textbf{Fragomen, Del Rey, Bernsen \& Loewy} & -- & PII & n/a & n/a & Oct & \cite{noauthor_fragomen_2020} \\
+\hdashline
+42 & US--\textbf{Key Ring} & 14.00 & PII & n/a & Jan & Feb & \cite{coble_key_2020} \\
+\hdashline
+43 & GB--\textbf{Virgin Media} & 0.90 & PII & n/a & Mar & Mar & \cite{cimpanu_virgin_2020} \\
+\hdashline
+44 & US--\textbf{U.S. Marshals Service} & 0.39 & PII & n/a & Dec & May & \cite{cimpanu_us_2020} \\
+\hdashline
+45 & US--\textbf{Vertafore} & 27.70 & PII & Mar & Aug & Nov & \cite{cimpanu_info_2020} \\
+\hdashline
+46 & US--\textbf{CouchSurfing} & 17.00 & PII & n/a & Jul & Jul & \cite{cimpanu_couchsurfing_2020} \\
+\hdashline
+47 & US--\textbf{Broadvoice} & 350.00 & PII, Sensitive Activity, Msg & n/a & Oct & Oct & \cite{noauthor_broadvoice_2020} \\
+\hdashline
+48 & US--\textbf{Avon} & 19.00 & PII & n/a & Jun & Jul & \cite{muncaster_cosmetics_2020} \\
+\hdashline
+49 & CN--\textbf{Peekaboo Moments} & n/a & PII, Media & n/a & Jul & Jul & \cite{mares_millions_2020} \\
+\hdashline
+\multicolumn{2}{l}{ \textbf{Other} } & & & & & \multicolumn{2}{c}{ Total: 11 } \\
+\hline
+50 & US--\textbf{Slickwraps} & 0.85 & PII, HR, Sys & Feb & Feb & Feb & \cite{lynx0x00_i_2020} \\
+\hdashline
+51 & US--\textbf{BlueLeaks (Netsential)} & 0.70 & PII, \$, Activity & n/a & Jun & Jun & \cite{krebs_blueleaks_2020} \\
+\hdashline
+52 & US--\textbf{Beaumont Health} & 0.00 & PII, Health & Feb & Oct & Jan & \cite{noauthor_6000_2020} \\
+\hdashline
+53 & US--\textbf{Dickey's BBQ} & 3.00 & \$ & May '19 & Sep '20 & Oct & \cite{krebs_breach_2020} \\
+\hdashline
+54 & US--\textbf{Health Share of Oregon} & 0.65 & PII++ & n/a & Jan & Feb & \cite{osborne_health_2020} \\
+\hdashline
+55 & US--\textbf{Walgreens} & <10 & PII & May & Jun & Jul & \cite{bizga_walgreens_2020} \\
+\hdashline
+56 & ES--\textbf{Freepik} & 8.30 & Auth & n/a & Aug & Aug & \cite{freepik_statement_2020} \\
+\hdashline
+57 & US--\textbf{Mashable.com} & n/a & PII, HR & n/a & Nov & Nov & \cite{waqas_shinyhunters_2020,mashable_notice_2020} \\
+\hdashline
+58 & US--\textbf{Dave Mobile Banking App} & 7.50 & PII, Auth & n/a & Jun & Jul & \cite{cimpanu_tech_2020} \\
+\hdashline
+59 & US--\textbf{General Electric} & 0.28 & PII & Feb & Feb & Mar & \cite{spadafora_general_2020} \\
+\hdashline
+60 & IL--\textbf{Promo.com} & 22.00 & PII & n/a & Jul & Jul & \cite{abrams_promocom_2020} \\
+\bottomrule
+\end{tabular}
+
+
+} % vertical padding
+\end{table*}

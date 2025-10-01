@@ -1,0 +1,153 @@
+\subsection{Server-Side Attacks}
+
+\begin{itemize}
+\item \textbf{Binary Planting:} Uploading and executing unauthorized binary files on the server, usually a specific location. Binary planting can be used to escalate privileges. An example of this is the Stuxnet virus using the  Microsoft Windows Print Spooler Service Remote Code Execution Vulnerability (CVE-2010-2729 / BID 43073). Also known as \textbf{DLL Planting} or \textbf{DLL Hijacking}.
+\item \textbf{SQL Injection}
+\begin{itemize}
+    \item Blind SQL Injection: Extracting data from a database by sending queries and observing the server's response time or behavior.
+\end{itemize}
+\item Blind XPath Injection: Extracting data from an XML document by sending queries and observing the server's response time or behavior.
+\item Buffer Overflow via Environment Variables: Manipulating environment variables to cause a buffer overflow and execute arbitrary code.
+\item Buffer Overflow Attack: Overwriting memory beyond the bounds of a buffer to corrupt data or execute arbitrary code.
+\item \textbf{CORS}
+\begin{itemize}
+    \item CORS Origin Header Scrutiny: Exploiting misconfigured Cross-Origin Resource Sharing (CORS) headers to access restricted resources.
+    \item CORS Request Preflight Scrutiny: Exploiting misconfigured CORS preflight requests to bypass security checks.
+\end{itemize}
+\item \textbf{File Injection:}
+\begin{itemize}
+    \item CSS 
+    \item CSV Injection: Injecting malicious payloads into CSV files to execute arbitrary code or perform unauthorized actions.
+\end{itemize}
+
+\item Cache Poisoning: Manipulating cached data to serve malicious content to users.
+\item Cash Overflow: Manipulating financial calculations to cause integer overflows and perform unauthorized transactions.
+\item Code Injection: Injecting malicious code into a vulnerable application to execute arbitrary commands or manipulate data.
+\item Command Injection: Executing arbitrary commands on the server by injecting them into vulnerable input fields.
+\item Comment Injection Attack: Injecting malicious comments or code into an application's data store or output.
+\item Content Spoofing: Tricking users into believing that malicious content is legitimate by mimicking the appearance of a trusted website.
+\item Custom Special Character Injection: Injecting special characters into input fields to bypass validation or cause unintended behavior.
+\item Denial of Service (DoS): Overwhelming a server with requests to exhaust its resources and make it unavailable to users.
+\item Direct Dynamic Code Evaluation - Eval Injection: Injecting malicious code into an application's eval() function to execute arbitrary commands.
+\item Embedding Null Code: Injecting null bytes into input fields to bypass validation or manipulate file paths.
+\item Execution After Redirect (EAR): Executing malicious code after a redirect to bypass security checks.
+\item Forced Browsing: Accessing restricted pages or resources by guessing or manipulating URLs.
+\item Form Action Hijacking: Modifying the action attribute of HTML forms to submit data to an attacker-controlled server.
+\item Format String Attack: Exploiting format string vulnerabilities to read or write arbitrary memory locations.
+\item Full Path Disclosure: Revealing the full path of files or directories on the server.
+\item Function Injection: Injecting malicious code into a vulnerable function to execute arbitrary commands or manipulate data.
+\item HTTP Response Splitting: Injecting newline characters into HTTP headers to split the response and insert malicious content.
+\item LDAP Injection: Injecting malicious LDAP queries to extract sensitive information or manipulate directory services.
+\item Log Injection: Injecting malicious payloads into application logs to execute arbitrary code or manipulate log data.
+\item Server-Side Includes (SSI) Injection: Injecting SSI directives to execute arbitrary commands or include malicious files.
+\item Server-Side Request Forgery (SSRF): Tricking a server into making unauthorized requests to internal or external resources.
+\item Session Prediction: Guessing or predicting valid session identifiers to hijack user sessions.
+\item Session Fixation: Forcing a user to use a predefined session identifier to hijack their session.
+\item Session Hijacking Attack: Stealing or predicting session identifiers to take over user sessions.
+\item Setting Manipulation: Modifying application settings or configuration files to alter its behavior or gain unauthorized access.
+\item Special Element Injection: Injecting special elements or tags into input fields to bypass validation or manipulate the application's behavior.
+\item Unicode Encoding: Exploiting Unicode encoding vulnerabilities to bypass input validation or inject malicious payloads.
+\item Web Parameter Tampering: Manipulating URL parameters or form data to perform unauthorized actions or bypass security checks.
+\item Windows ::DATA Alternate Data Stream: Hiding malicious files or data in alternate data streams on Windows systems.
+\item XML External Entity (XXE) Injection: Exploiting XML parsers to access unauthorized files or network resources.
+\item XPath Injection: Injecting malicious XPath queries to extract sensitive information from XML documents.
+\item Cross-Site Request Forgery (CSRF): Tricking users into performing unintended actions on a web application in which they are authenticated.
+\item Web Service Amplification Attack: Exploiting web services to amplify denial of service attacks by sending large amounts of data.
+\end{itemize}
+
+
+\hypertarget{other-attacks}{%
+\subsubsection{Other Attacks:}\label{other-attacks}}
+
+\begin{itemize}
+\item
+  Brute Force Attack
+\item
+  Cross-User Defacement
+\item
+  Forced browsing
+\item
+  Form action hijacking by Robert Gilbert (amroot)
+\item
+  Man-in-the-browser attack
+\item
+  Manipulator-in-the-middle attack
+\item
+  Parameter Delimiter
+\item
+  Path Traversal
+\item
+  Regular expression Denial of Service - ReDoS by Adar Weidman
+\item
+  Repudiation Attack
+\item
+  Resource Injection
+\item
+\begin{verbatim}
+* **Inband**. The same channel is used to inject SQL code and extract sensitive data.
+\end{verbatim}
+\item
+\begin{verbatim}
+* **Out-of-band.**  Data is retrieved using a different channel.
+\end{verbatim}
+\item
+\begin{verbatim}
+* **Inferential.**  Gaining information from behaviour server based on sent requests.
+\end{verbatim}
+\item
+\begin{verbatim}
+* Tools:
+\end{verbatim}
+\item
+\begin{verbatim}
+    * mieliekoek.pl
+\end{verbatim}
+\item
+\begin{verbatim}
+    * wpoison
+\end{verbatim}
+\item
+\begin{verbatim}
+    * sqlmap
+\end{verbatim}
+\item
+\begin{verbatim}
+    * wapiti
+\end{verbatim}
+\item
+\begin{verbatim}
+    * w3af
+\end{verbatim}
+\item
+\begin{verbatim}
+    * paros
+\end{verbatim}
+\item
+\begin{verbatim}
+    * sqid
+\end{verbatim}
+\item
+\begin{verbatim}
+* User input
+\end{verbatim}
+\item
+\begin{verbatim}
+* Cookies
+\end{verbatim}
+\item
+\begin{verbatim}
+* HTTP Headers
+\end{verbatim}
+\item
+\begin{verbatim}
+* Second-order SQL Injections
+\end{verbatim}
+\item
+  Traffic flood
+\item
+  Trojan Horse
+\item
+  Unicode Encoding
+\item
+  Windows ::DATA Alternate Data Stream
+\end{itemize}

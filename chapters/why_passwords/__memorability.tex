@@ -1,0 +1,196 @@
+\subsection{Memorability}
+
+To design an effective password composition policy that balances \textbf{complexity} (entropy) and \textbf{memorability} (ease of understanding), we can formulate a multi-objective optimization framework. This framework integrates measures of both complexity and memorability to derive an optimal policy that maximizes security while ensuring usability for users.
+
+### 1. **Definitions and Notations**
+
+- **Password Structure Set**: Let \( \mathcal{S} = \{ S_1, S_2, \dots, S_m \} \) denote the set of all possible password structures, where each structure \( S_j \) is a sequence of elements from the alphabet \( \Sigma \). For example, \( S_j = (w, w, d) \) represents a structure with two words followed by a digit.
+
+- **Probability of a Structure**: Let \( P(S_j) \) denote the probability of selecting structure \( S_j \) in the password dataset. The structure probabilities satisfy:
+  \[
+  \sum_{j=1}^{m} P(S_j) = 1
+  \]
+
+- **Elements within Structures**: For a given structure \( S_j = (e_1, e_2, \dots, e_k) \), each element \( e_i \in \Sigma \) has an associated probability \( P(e_i \mid S_j) \).
+
+- **Entropy (Complexity)**: The entropy \( H \) of the password dataset measures its complexity and is defined as:
+  \[
+  H = H(\mathcal{S}) + \sum_{j=1}^{m} P(S_j) H(\mathcal{E} \mid S_j)
+  \]
+  where:
+  \[
+  H(\mathcal{S}) = - \sum_{j=1}^{m} P(S_j) \log P(S_j)
+  \]
+  and
+  \[
+  H(\mathcal{E} \mid S_j) = - \sum_{e_i \in \Sigma_j} P(e_i \mid S_j) \log P(e_i \mid S_j)
+  \]
+
+- **Memorability Measure**: Let \( M \) denote the memorability of the password dataset. We define \( M \) as a function that quantifies the ease with which users can remember their passwords. For mathematical modeling, \( M \) can be represented as:
+  \[
+  M = \sum_{j=1}^{m} P(S_j) M(S_j)
+  \]
+  where \( M(S_j) \) is the memorability score of structure \( S_j \). Higher values of \( M \) indicate greater memorability.
+
+### 2. **Multi-Objective Optimization Framework**
+
+To balance complexity and memorability, we define an objective function that incorporates both \( H \) and \( M \). This can be achieved through a weighted sum approach or by setting constraints.
+
+#### a. **Weighted Sum Approach**
+
+Define a weight parameter \( \lambda \in [0, 1] \) that balances the importance between complexity and memorability. The objective function \( \mathcal{O} \) to be maximized is:
+\[
+\mathcal{O} = H + \lambda M
+\]
+Substituting the definitions of \( H \) and \( M \):
+\[
+\mathcal{O} = \left[ H(\mathcal{S}) + \sum_{j=1}^{m} P(S_j) H(\mathcal{E} \mid S_j) \right] + \lambda \left[ \sum_{j=1}^{m} P(S_j) M(S_j) \right]
+\]
+The optimization problem becomes:
+\[
+\max_{\{ P(S_j), P(e_i \mid S_j) \}} \mathcal{O} = H + \lambda M
+\]
+**Subject to:**
+\[
+\sum_{j=1}^{m} P(S_j) = 1
+\]
+\[
+\sum_{e_i \in S_j} P(e_i \mid S_j) = 1 \quad \forall j = 1, 2, \dots, m
+\]
+\[
+P(S_j) \geq 0 \quad \forall j
+\]
+\[
+P(e_i \mid S_j) \geq 0 \quad \forall e_i, S_j
+\]
+
+#### b. **Constrained Optimization Approach**
+
+Alternatively, we can maximize complexity \( H \) while ensuring that memorability \( M \) meets a minimum threshold \( M_{\text{min}} \):
+\[
+\max_{\{ P(S_j), P(e_i \mid S_j) \}} H
+\]
+**Subject to:**
+\[
+M \geq M_{\text{min}}
+\]
+\[
+\sum_{j=1}^{m} P(S_j) = 1
+\]
+\[
+\sum_{e_i \in S_j} P(e_i \mid S_j) = 1 \quad \forall j
+\]
+\[
+P(S_j) \geq 0 \quad \forall j
+\]
+\[
+P(e_i \mid S_j) \geq 0 \quad \forall e_i, S_j
+\]
+
+### 3. **Modeling the Memorability Function \( M(S_j) \)**
+
+The memorability of a structure \( S_j \) can be modeled based on several factors, such as:
+
+- **Simplicity of Structure**: Structures with fewer and more familiar elements (e.g., common words) are generally more memorable.
+- **Semantic Relationships**: Structures where elements have meaningful or coherent relationships may enhance memorability.
+- **Pattern Regularity**: Structures with regular patterns or repetitions may be easier to remember.
+
+Mathematically, \( M(S_j) \) can be expressed as:
+\[
+M(S_j) = \alpha \cdot f_{\text{simplicity}}(S_j) + \beta \cdot f_{\text{semantic}}(S_j) + \gamma \cdot f_{\text{pattern}}(S_j)
+\]
+where \( \alpha, \beta, \gamma \) are weighting coefficients that balance the contribution of each factor, and:
+\[
+f_{\text{simplicity}}(S_j) = \text{Function quantifying simplicity}
+\]
+\[
+f_{\text{semantic}}(S_j) = \text{Function quantifying semantic coherence}
+\]
+\[
+f_{\text{pattern}}(S_j) = \text{Function quantifying pattern regularity}
+\]
+
+### 4. **Incorporating Constraints for Policy Design**
+
+To ensure that the password composition policy is practical and enforceable, we may incorporate additional constraints such as:
+
+- **Minimum and Maximum Structure Length**:
+  \[
+  k_{\text{min}} \leq |S_j| \leq k_{\text{max}} \quad \forall S_j \in \mathcal{S}
+  \]
+  where \( |S_j| \) denotes the number of elements in structure \( S_j \).
+
+- **Prohibited Patterns or Elements**:
+  \[
+  P(e_i \mid S_j) = 0 \quad \text{for prohibited } e_i \text{ in structure } S_j
+  \]
+
+- **Minimum Entropy Requirements**:
+  \[
+  H \geq H_{\text{min}}
+  \]
+
+### 5. **Strategy for Designing the Password Composition Policy**
+
+Based on the above framework, the strategy to design the password composition policy involves the following steps:
+
+#### a. **Define the Structure Set \( \mathcal{S} \)**
+Determine the allowable password structures based on desired elements (e.g., words, numbers, symbols) and their sequence.
+
+#### b. **Model Complexity and Memorability**
+- **Complexity**: Calculate the entropy \( H \) for each structure and the overall dataset.
+- **Memorability**: Define and compute the memorability function \( M(S_j) \) for each structure.
+
+#### c. **Formulate the Optimization Problem**
+Decide on the objective (e.g., maximize \( H + \lambda M \) or maximize \( H \) subject to \( M \geq M_{\text{min}} \)) and set up the corresponding optimization problem.
+
+#### d. **Solve the Optimization Problem**
+Determine the optimal structure probabilities \( P(S_j) \) and element probabilities \( P(e_i \mid S_j) \) that achieve the desired balance between complexity and memorability.
+
+#### e. **Implement Policy Constraints**
+Incorporate practical constraints to ensure the policy is user-friendly and enforceable.
+
+#### f. **Iterative Refinement**
+Continuously monitor password usage and feedback to adjust the policy parameters \( \lambda \), \( \alpha \), \( \beta \), \( \gamma \), and the structure set \( \mathcal{S} \) to optimize both security and usability.
+
+### 6. **Illustrative Example**
+
+Consider a simplified scenario with two possible structures:
+- \( S_1 = (w, w, w) \) (three words)
+- \( S_2 = (w, d, s) \) (word, digit, symbol)
+
+Assume the following for memorability:
+\[
+M(S_1) = 0.8 \quad \text{and} \quad M(S_2) = 0.6
+\]
+
+And entropy calculations:
+\[
+H(\mathcal{S}) = - P(S_1) \log P(S_1) - P(S_2) \log P(S_2)
+\]
+\[
+H(\mathcal{E} \mid S_1) = H_{\text{words}} \quad \text{and} \quad H(\mathcal{E} \mid S_2) = H_{\text{word}} + H_{\text{digit}} + H_{\text{symbol}}
+\]
+
+Using the weighted sum approach with \( \lambda = 0.5 \):
+\[
+\mathcal{O} = H(\mathcal{S}) + P(S_1) H_{\text{words}} + P(S_2) (H_{\text{word}} + H_{\text{digit}} + H_{\text{symbol}}) + 0.5 [P(S_1) \cdot 0.8 + P(S_2) \cdot 0.6]
+\]
+
+Solving the optimization problem would yield the optimal probabilities \( P(S_1) \) and \( P(S_2) \) that maximize \( \mathcal{O} \), thereby balancing complexity and memorability.
+
+### 7. **Conclusion and Policy Recommendation**
+
+To design a robust password composition policy for your website that maximizes security while ensuring ease of use:
+
+1. **Integrate Complexity and Memorability**: Utilize a multi-objective optimization framework that considers both entropy (complexity) and a defined memorability measure.
+
+2. **Diversify Structure Probabilities**: Allow a variety of password structures with probabilities optimized to balance entropy and memorability. Avoid enforcing a single structure (e.g., three words) to prevent predictability and potential entropy reduction.
+
+3. **Optimize Structure Selection**: Allocate higher probabilities to structures that offer higher entropy and sufficient memorability, ensuring that users are encouraged to adopt strong yet memorable password formats.
+
+4. **Set Practical Constraints**: Incorporate constraints to maintain usability, such as limiting structure complexity to manageable levels and ensuring that all allowed structures meet minimum security requirements.
+
+5. **Continuous Evaluation and Adjustment**: Regularly assess the effectiveness of the password policy by analyzing password entropy and user feedback on memorability, adjusting the policy parameters as necessary to maintain an optimal balance.
+
+By adopting this strategic, mathematically grounded approach, your website can implement a password composition policy that enhances security through high-entropy passwords while maintaining user-friendly memorability.

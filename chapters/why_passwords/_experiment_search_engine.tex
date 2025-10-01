@@ -1,0 +1,10 @@
+\section{Experiment: Search Engines}
+Search engines have a special function to suggest correction to the user's input. Let \( f(x) \) represent the function used by search engines to suggest corrections to user inputs, where \( x \) is the input string. This function addresses issues such as misspellings, concatenation, or low search frequency. An example is Google's \textit{"Did you mean..."} function, let this be $f_G(x)$.
+
+Define a set of passwords \( P \) from a labeled corpus, such that \( P = \{ p_1, p_2, \ldots, p_n \} \), where each \( p_i \) satisfies the following conditions:
+\begin{enumerate}
+    \item \( p_i \) contains no digits.
+    \item \( p_i \) is not found in any predefined dictionaries \( D \).
+\end{enumerate}
+
+Given \( |P| = 3062 \), we apply \( f_G \) to each \( p_i \), i.e. using the Google search engine: \( f_G(p_i) \) for \( i = 1, 2, \ldots, 3062 \). The outputs are saved as \texttt{HTML} files for experimental reproducibility. Finally, the results of \( f_G(p_i) \) are compared against our own labeled set \( P \).

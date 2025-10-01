@@ -1,0 +1,96 @@
+\section{Password\;Strength\;and\;Composition\;Overview}
+% Understanding the complexities of password labelling requires acknowledging the challenges in breaking down password strings. These challenges include transformations such as 1337 speak, phonetics, syllable insertions, reversals, and various other alterations. Our analysis categories passwords into a hierarchical structure based on the composition of character sets. Visualise this as a spectrum: on one end, purely numeric passwords like \texttt{"12345"}, and on the other, completely alphabetical passwords, such as \texttt{"teamoreviewertwo"}.
+% 
+% With a comprehensive dictionary, we successfully label most passwords found within it. Yet, for passwords following the $L_xD_y$ pattern, determining whether the trailing digits are integral to the password poses a challenge.
+
+% \paragraph{Language models.} Large Language Models (LLMs) have been proven useful for data format transformations and partly for reasoning. They have had many use cases such as for GeoLLM \cite{Manvi_Khanna_Mai_Burke_Lobell_Ermon_2023}. Because of their high-cost training on number of tokens, we believe they can act as a large dictionary alternative; they have a large vocabulary that we assume would prove beneficial. The prominent Open Source models are LLaMa-2, Mistral and variants of these two. We will also utilize the GPT3.5 model.
+
+\textbf{\textsc{Password Strength.}}\: This measures the difficulty of guessing or cracking a password. However, there is no consensus on how to quantify this difficulty. Some use dictionary-based methods, some use probabilistic methods. Nonetheless, some lower-bound measures are widely accepted, such as the number of characters, to make the password resistant to brute-force.
+
+Shannon's entropy (Eq. \ref{eq:entropy}) quantifies the uncertainty or information content associated with a random variable. \begin{equation}\label{eq:entropy}
+H(X) = -\sum_{x\in\mathcal{X}}^{} p(x) \log p(x)
+\end{equation} In the context of password strength, it measures how unpredictable or "random" a password is. The higher the entropy, the more difficult the password is to guess, making it stronger. This metric estimates the minimum number of bits required to encode the password. However, the entropy measure for passwords is often given in the form of Eq. \ref{eq:e}.
+\begin{equation}\label{eq:e}
+E = \log_2(R^L)
+\end{equation}
+$R$ represents the total number of characters in the character sets used in the password, and $L$ is the length of the password.
+
+The limitation of Eq.\,\ref{eq:e} is that it assumes all $R$ characters are equally likely, disregarding the dependency between characters. This approach oversimplifies, as passwords like \texttt{8zm!U6gNL\%} and \texttt{p4\$sW0rd1!} are calculated to have the same entropy. However, such an assumption is unrealistic, as the latter password is essentially the word \textit{password} with predictable transformations and common end-character additions.
+
+\textbf{\textsc{Password Composition Policies (PCP).}}\: PCP is a set of rules, often expressed in natural language, that restricts users to selecting passwords from a space assumed to be resistant to guessing attacks. The \textit{National Cyber Security Centre (NCSC)}~\cite{ncsc2024} in the UK and the \textit{National Institute of Standards and Technology (NIST)}~\cite{nist2024} in the USA are leading authorities in cybersecurity. Their recommendations, particularly on password policies, should serve as standards or benchmarks in the field. Specifically, the NCSC advocates for the use of three random words~\cite{McCormackthreerandom} and advises against mandatory password complexity requirements~\cite{password_policy_ncsc}. This approach, detailed in~\cite{Kate_2021}, is based on the principle that a sequence of three random words is both easier for users to remember and sufficiently complex to deter unauthorised access, striking a balance between security and user convenience.
+
+The random words meet the following conditions:
+
+\begin{itemize}[itemsep=0pt, parsep=0pt, leftmargin=11pt]
+    \item \textbf{Length}.  Likely to satisfy the minimum length requirements.
+    \item \textbf{Impact}.  Easy to adopt and understand.
+    \item \textbf{Novelty}.  Unlikely to find it in a breached database.
+    \item \textbf{Usability}.  More likely to be remembered.
+\end{itemize}
+
+NIST's \cite{Grassi_Garcia_Fenton_2020} PCP is as follows. Passwords should have a minimum length of 8 characters, but systems should support more than 64 characters. It is advised to compare the selected password against prior breach data, dictionary entries, and repetitive patterns. Context-specific terms should also be considered. Additionally, users should be aided with strength meters to gauge password robustness. While rate limiting should be enforced during authentication attempts, use of specific composition rules is discouraged.
+% \begin{python}
+% cs = {
+%     "u": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+%     "l": "abcdefghijklmnopqrstuvwxyz",
+%     "d": "0123456789",
+%     "s": "!@\#\$\%\^\&\*"
+% }
+% cs_num = { "u": 26, "l": 26, "d": 10, "s": 8 }
+% 
+% def get_character_set(char):
+%     for key, value in cs.items():
+%         if char in value:
+%             return key
+%     return None
+% 
+% def entropy(pwd: str) -> float:
+%     diffchars = sum(
+%         [cs_num.get(x) for x in list(
+%             set(map(get_character_set, set(pwd)))
+%         )]
+%     )
+%     return math.log2(diffchars ** len(pwd))
+% \end{python}
+
+
+% \subsection{Challenges in decomposition}
+% 
+% Decomposing of the passwords into useful words or phrases has limitations that has been studied before. Majority of the techniques will rely on having a dictionary with all possible words. The challenge for us is that passwords can contain numerous languages and word transformations. Thus, creating such a dictionary is difficult.
+% 
+% \begin{itemize}
+%     \item Spelling mistakes
+%     \item Dialects
+%     \item Word transformation
+%     \begin{itemize}
+%         \item Visual
+%         \item Phonetics/Audio
+%         \item ? other
+%     \end{itemize}
+% \end{itemize}
+% 
+% \begin{itemize}
+%     \item K-gram index
+%     \item Weighted edit distance
+%     \item Hidden markov model
+%     \item Levenshtein distance
+%     \item Probability models
+% \end{itemize}
+
+% \subsection{Models}
+% 
+% - Transformers
+% - Autoencoders
+% - Encoder-decoder models
+% 
+% \begin{itemize}
+%     \item GPT-3.5-Turbo
+%     \item Llama2
+%     \item Mistral 7B
+%     \item ByT5.  The usefulness of this model is that there is no tokenisation, therefore it is more useful for noisy data. Password is inherently noisy, and we can imagine that we are trying to remove the noise and reveal the patterns and useful words.
+% \end{itemize}
+
+
+% LoRa \cite{Hu_Shen_et_al_2021}
+% 
+% QLoRa \cite{Dettmers_Pagnoni_Holtzman_Zettlemoyer_2023}

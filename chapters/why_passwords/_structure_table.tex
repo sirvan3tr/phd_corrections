@@ -1,0 +1,44 @@
+\begin{table*}[h]
+    \centering
+    %\footnotesize
+    \scriptsize
+    
+    \caption{The table presents the top 25 labelled password structures from the passwordNinja \cite{almasi2024passwordninja} dataset, accounting for 5\,032 (69.5\%) of the labelled dataset. Hashcat \cite{steube_hashcat_2023} benchmarks indicate the performance of consumer hardware in a hybrid attack. The dictionary size for $\bm{w}$ (words) and $\bm{n}$ (numbers) is set at $5\times 10^5$. \zxcvbn serves as a password strength meter, with scores ranging from 0 to 4, and guess estimates are log based.}
+    \label{table:structures}
+    \setlength\tabcolsep{1pt} % default value: 6pt
+    {\renewcommand{\arraystretch}{0.3}% for the vertical padding
+    \begin{tabular}{rllc|cccc|cc}
+    % \toprule
+     & & \multicolumn{2}{c}{Frequency}  & \multicolumn{4}{c}{Hashcat using Nvidia RTX 4090} & \multicolumn{2} {c}{\zxcvbnnocite Mean} \\\cmidrule{3-4} \cmidrule{5-10}
+    \textbf{Structure} & \textbf{$log$ perm'} & \textbf{Count} & \textbf{\%} & \textbf{MD5} & \textbf{PBKDF2-sha256} & \textbf{scrypt} & \textbf{bcrypt-sha512} & \textbf{Score} & \textbf{Guesses} \\
+    \midrule
+w & \DrawLengthBarThick{4.7} & \DrawLengthBarThick{15.2} 1520 & 21.0 & $\sim0$ & 0.1 s & 1 min & 4 min & 1.3 & 5.36 \\
+n & \DrawLengthBarThick{4.7} & \DrawLengthBarThick{8.11} 811 & 11.2 & $\sim0$ & 0.1 s & 1 min & 4 min & 1.0 & 4.72 \\
+nd & \DrawLengthBarThick{5.6} & \DrawLengthBarThick{0.58} 58 & 0.8 & $\sim0$ & 0.6 s & 12 min & 42 min & 1.4 & 5.68 \\
+wd & \DrawLengthBarThick{5.6} & \DrawLengthBarThick{0.91} 91 & 1.3 & $\sim0$ & 0.6 s & 12 min & 42 min & 1.5 & 5.97 \\
+nl & \DrawLengthBarThick{5.9} & \DrawLengthBarThick{0.33} 33 & 0.5 & $\sim0$ & 1.5 s & 30 min & 2 h & 1.2 & 5.09 \\
+wdd & \DrawLengthBarThick{6.4} & \DrawLengthBarThick{2.94} 294 & 4.1 & $\sim0$ & 5.6 s & 2 h & 7 h & 1.8 & 6.69 \\
+ndd & \DrawLengthBarThick{6.4} & \DrawLengthBarThick{2.21} 221 & 3.1 & $\sim0$ & 5.6 s & 2 h & 7 h & 1.6 & 6.33 \\
+nddd & \DrawLengthBarThick{7.2} & \DrawLengthBarThick{0.71} 71 & 1.0 & $\sim0$ & 56.4 s & 19 h & 3 day & 1.7 & 6.37 \\
+wddd & \DrawLengthBarThick{7.2} & \DrawLengthBarThick{0.91} 91 & 1.3 & $\sim0$ & 56.4 s & 19 h & 3 day & 1.9 & 6.84 \\
+wsdd & \DrawLengthBarThick{7.6} & \DrawLengthBarThick{0.29} 29 & 0.4 & $\sim0$ & 3 min & 3 day & 9 day & 2.0 & 7.28 \\
+ddddw & \DrawLengthBarThick{8.1} & \DrawLengthBarThick{0.35} 35 & 0.5 & $\sim0$ & 9 min & 8 day & 29 day & 2.4 & 7.95 \\
+wdddd & \DrawLengthBarThick{8.1} & \DrawLengthBarThick{1.74} 174 & 2.4 & $\sim0$ & 9 min & 8 day & 29 day & 2.3 & 7.59 \\
+ndddd & \DrawLengthBarThick{8.1} & \DrawLengthBarThick{2.05} 205 & 2.8 & $\sim0$ & 9 min & 8 day & 29 day & 2.0 & 6.90 \\
+nn & \DrawLengthBarThick{9.5} & \DrawLengthBarThick{3.76} 376 & 5.2 & 1.5 s & 8 h & 1 yr & 4 yr & 2.0 & 6.91 \\
+ww & \DrawLengthBarThick{9.5} & \DrawLengthBarThick{4.57} 457 & 6.3 & 1.5 s & 8 h & 1 yr & 4 yr & 2.0 & 7.04 \\
+nw & \DrawLengthBarThick{9.5} & \DrawLengthBarThick{0.3} 30 & 0.4 & 1.5 s & 8 h & 1 yr & 4 yr & 2.2 & 7.51 \\
+ndddddd & \DrawLengthBarThick{9.7} & \DrawLengthBarThick{0.51} 51 & 0.7 & 3.0 s & 16 h & 2 yr & 8 yr & 2.5 & 8.05 \\
+wdddddd & \DrawLengthBarThick{9.7} & \DrawLengthBarThick{0.33} 33 & 0.5 & 3.0 s & 16 h & 2 yr & 8 yr & 2.8 & 8.84 \\
+wwdd & \DrawLengthBarThick{11.1} & \DrawLengthBarThick{0.58} 58 & 0.8 & 3 min & 33 day & 111 yr & 402 yr & 2.9 & 8.97 \\
+nndd & \DrawLengthBarThick{11.1} & \DrawLengthBarThick{0.38} 38 & 0.5 & 3 min & 33 day & 111 yr & 402 yr & 3.2 & 9.62 \\
+wwdddd & \DrawLengthBarThick{12.8} & \DrawLengthBarThick{0.33} 33 & 0.5 & 4 h & 9 yr & $1.11 \times 10^{4}$ yr & $4.02 \times 10^{4}$ yr & 3.3 & 9.81 \\
+nwn & \DrawLengthBarThick{14.2} & \DrawLengthBarThick{0.41} 41 & 0.6 & 9 day & 447 yr & $5.56 \times 10^{5}$ yr & $2.01 \times 10^{6}$ yr & 3.0 & 8.88 \\
+www & \DrawLengthBarThick{14.2} & \DrawLengthBarThick{1.65} 165 & 2.3 & 9 day & 447 yr & $5.56 \times 10^{5}$ yr & $2.01 \times 10^{6}$ yr & 3.0 & 9.26 \\
+nww & \DrawLengthBarThick{14.2} & \DrawLengthBarThick{0.35} 35 & 0.5 & 9 day & 447 yr & $5.56 \times 10^{5}$ yr & $2.01 \times 10^{6}$ yr & 2.7 & 8.18 \\
+nnn & \DrawLengthBarThick{14.2} & \DrawLengthBarThick{0.27} 27 & 0.4 & 9 day & 447 yr & $5.56 \times 10^{5}$ yr & $2.01 \times 10^{6}$ yr & 3.3 & 9.95 \\
+wwww & \DrawLengthBarThick{15.3} & \DrawLengthBarThick{0.55} 55 & 0.8 & 171 day & $8.70 \times 10^{3}$ yr & $1.08 \times 10^{7}$ yr & $3.91 \times 10^{7}$ yr & 3.5 & 11.24 \\
+\bottomrule
+    \end{tabular}
+    } %% vertical padding
+\end{table*}
