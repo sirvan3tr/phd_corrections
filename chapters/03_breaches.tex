@@ -210,37 +210,54 @@ The majority of incidents in our results led to breaches of personally identifia
 
 We have opportunities in \emph{defending} data from being compromised and \emph{defending} systems and organisations against fraud. Should we rely on \emph{secrecy} and \emph{what-you-know} identity checks? Can legal and decentralised national identity systems neutralise this attack vector? Identity checks, or know-your-customer (KYC) processes, slow down customer onboarding. Therefore, future innovation and research should seek a balance between security and business costs.
 
-\subsection{PII Uniform Resource Identifier}
-
-Can the standardisation of storage and communication schemes of PII
-improve security and usability? Such a PII URI can provide the following
-benefits.
-
-\begin{itemize}
-\item \textit{Privacy:} Regulations, such as GDPR in Europe and CCPA in California \cite{noauthor_california_2018}, demand the right for the owner of a dataset to have visibility and access to it. With a URI scheme, there is no ambiguity about how individuals can get access to their data over the web.
-
-\item \textit{Separation of databases:} Organisations can separate PII data from other operational data.
-
-\item \textit{Security:} Creating standardised methods of storing and accessing data can improve security. Furthermore, organisations can separate PII data from other data.
-
-\item \textit{Communication:} PII and other sensitive data are regularly sent over insecure email systems. With a user friendly system built on a URI scheme, one can communicate PII across to other PII storage systems.
-
-\item \textit{Regulation:} This URI scheme and systems can have options to communicate with regulators to report data breaches or create automatic reports. This can improve the relationship between the regulator and the business.
-
-\end{itemize}
+%\subsection{PII Uniform Resource Identifier (URI)}
+%
+%Can the standardisation of storage and communication schemes of PII
+%improve security and usability? Our review of the breaches show similar pattern of uncontrolled copies of PII spread across systems with no clear security policies behind them. A PII URI addresses these issues by providing each individual with a resolvable pointer to where their PII is stored and the policies to access it. Standardising this pointer and the surrounding API/policy model aims to improve privacy and usability: people can discover, grant, and revoke access in one place; organisations can separate sensitive PII from operational systems; and sensitive communications move off email into encrypted, auditable channels. Openbanking API is an example of how openining up and standardising the access to financial data leads to economic benefits. Fast Healthcare Interoperability Resources (FHIR).
+%
+%Mechanically, a relying party receives a `pii:` identifier (or an HTTPS link to `/.well-known/pii`) and resolves it to a small JSON descriptor. That descriptor lists data categories and schemas, API endpoints, the authorization server, supported security profiles, and basic policies (e.g., retention, breach contact). The relying party then asks for a narrow scope with a stated purpose; the user authenticates at their PII provider, grants consent, and a bound, short‑lived token is issued. Only the approved fields are returned—ideally via selective‑disclosure credentials rather than full records—and all access is logged. For sending data, the descriptor can publish an encrypted inbox so PII is exchanged over secure channels instead of email. Standard profiles (OAuth 2.1 or GNAP, FAPI, DPoP or mTLS), consent receipts, webhooks for revocation, and pairwise identifiers provide the security building blocks.
+%
+%Governance can mirror Open Banking—accredited providers listed in a trust directory, common API and security profiles—but the scope is broader than finance, so privacy controls must be stricter (purpose limitation and minimization by default, pairwise identifiers to prevent correlation, token binding, and timely breach reporting). Incentives are practical: providers can offer “compliance‑as‑a‑service,” relying parties reduce integration and liability costs, regulators get consistent visibility, and users gain portability and control. In the chapters that follow on secrets and protections, this model reduces secret sprawl by replacing emailed PII and static exports with short‑lived, auditable tokens and clear consent, directly addressing the breach causes we observed.
+%
+%Can the standardisation of storage and communication schemes of PII
+%improve security and usability? Such a PII URI can provide the following benefits.
+%
+%
+%\begin{itemize}
+%\item \textit{Privacy:} Regulations, such as GDPR in Europe and CCPA in California \cite{noauthor_california_2018}, demand the right for the owner of a dataset to have visibility and access to it. With a URI scheme, there is no ambiguity about how individuals can get access to their data over the web.
+%
+%\item \textit{Separation of databases:} Organisations can separate PII data from other operational data.
+%
+%\item \textit{Security:} Creating standardised methods of storing and accessing data can improve security. Furthermore, organisations can separate PII data from other data.
+%
+%\item \textit{Communication:} PII and other sensitive data are regularly sent over insecure email systems. With a user friendly system built on a URI scheme, one can communicate PII across to other PII storage systems.
+%
+%\item \textit{Regulation:} This URI scheme and systems can have options to communicate with regulators to report data breaches or create automatic reports. This can improve the relationship between the regulator and the business.
+%
+%\end{itemize}
 
 \section{Discussion}
 \label{sec::chp3::discussion}
 
-Our intent has been to review web security and data breaches in 2020 to extract lessons learned and identify research opportunities. These incidents have resulted in the exposure of millions of personally identifiable information (PII) records, payment details, and health information. The consequences have affected all stakeholders: customers face identity theft and fraud, organisations suffer business losses, are required to compensate customers, and must contend with regulatory penalties. While the majority of these discussions have been addressed in previous sections, here we will explore the final point—examining the criminals behind these attacks and the limitations of this study.
+%Our intent has been to review web security and data breaches in 2020 to extract lessons learned and identify research opportunities. These incidents have resulted in the exposure of millions of personally identifiable information (PII) records, payment details, and health information. The consequences have affected all stakeholders: customers face identity theft and fraud, organisations suffer business losses, are required to compensate customers, and must contend with regulatory penalties. While the majority of these discussions have been addressed in previous sections, here we will explore the final point—examining the criminals behind these attacks and the limitations of this study.
+
+\textit{Have I Been Pwned?}~\cite{haveibeenpwned} popularised the issue of data breaches and raised awareness of PII and credential leaks. Such awareness has most likely improved the security of many user accounts, as users have been able to change passwords when a leak has occurred. This chapter has, in the same vein, attempted to raise awareness of a large number of breaches in order to understand them and offer solutions on how to defend against them in the future.
+
+We used public news reports instead of dark web publications and breaches because not all breaches are reported in time. Moreover, some breaches are not leaked publicly, so they do not have much presence on the dark web. Our aim has been to understand the nature of the breach rather than the leaked data from the breach.
 
 Our results showed that the Magecart group was behind most of the Man-in-the-Browser (MitB) attacks, and ShinyHunters was behind most of the unknown attacks. This over-reporting of ShinyHunters could be because they openly sell their data online. Their odd behaviour of sometimes making the data available for free adds to the mystery and potential for their name appearing in open-source media. Nevertheless, the evidence shows a network of individuals who have the knowledge, capability, and willingness to carry out these attacks.
 
 The results reinforce the necessity of regulatory oversight: from Virgin Media leaving their marketing database exposed to PhotoSquared storing a vast trove of information in an unprotected AWS storage bucket, numerous organisations have failed to secure their databases and storage instances. The complacent behaviour of many organisations, coupled with a clear lack of learning from past incidents, underscores the need for stringent regulatory~measures.
 
 Reported security breaches covered by various news sources are mostly high-profile cases. As a result, we acknowledge that our dataset represents only a small portion of actual security breaches, making it impossible to correlate our findings with the total number of web attacks and data breaches. Nevertheless, our findings remain valuable given the sample size and the reported incidents. We have been able to extract key lessons and gather useful data for future~research.
-\newpage
-The cases we have covered have all been reported through English-speaking media outlets, and all the organisations involved are either European or North American. However, we do not believe that the nature of threats and attack vectors would differ significantly in other~countries.
+
+The cases we have covered have all been reported through English-speaking media outlets, and all the organisations involved are either European or North American. However, we do not believe that the nature of threats and attack vectors would differ significantly in other countries. Moreover, the reliance on publicly reported incidents creates a significant selection bias towards organisations that either voluntarily disclosed breaches or were legally required to do so, potentially missing a substantial ``dark figure'' of unreported incidents. Small and medium enterprises may be underrepresented, as they often lack the resources for comprehensive incident response and may avoid public disclosure to protect their reputation.
+
+The categorisation of attack types and attributions depends on the initial news reports, which may later prove inaccurate as investigations develop. The complexity of modern supply chain attacks and the use of shared tools across different criminal groups can lead to misattribution or oversimplified categorisation of incidents.
+
+There is a risk that data collected in 2020 might be irrelevant in 2025. However, we could conduct a historical analysis if we were to repeat the experiment today or in the future. The field of cybersecurity and the nature of threats are rapidly evolving (attack vectors, defence, and regulations). Such rapid change could mean that the results and outcomes will not be relevant to practitioners today. Our view is that the 2020 data provides a baseline for measuring progress (or lack thereof) in cybersecurity practices.
+
+An LLM can be used to provide continual analysis. The data can be used to fine-tune an LLM to scrape the web, collate data breaches, and conduct analysis on a daily basis. This approach could be used to provide real-time threat intelligence gathering and pattern recognition across multiple languages and regions.
 
 \section{Summary}
 \label{sec::chp3::summary}

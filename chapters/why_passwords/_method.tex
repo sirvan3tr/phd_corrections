@@ -7,7 +7,45 @@ This is a method to calculate the pre-image of a password through decomposition.
 
 The \hmail dataset, which leaked in 2009 \cite{johnson_hotmail_2009}, comprises 8\,929 records of passwords. Public sources indicate that these passwords were procured through phishing. Abundant evidence within the dataset supports this claim. For instance, we observe numerous passwords with inverted capitalisation and similar passwords that contain typos, suggesting that users might have unintentionally activated \texttt{CAPS\;LOCK}.
 
+
+
 \textbf{\textsc{Labelling.}}\: We segmented the 8\,929 leaked passwords based on their structural characteristics. Numeric-only passwords were excluded. The remainder was categorised into three groups: 1) Passwords following an $L_nD_n$ pattern, consisting of letters followed by digits; 2) Passwords with an $L_n$ structure, including letters and symbols; and 3) Those that did not fit the previous categories, labelled as $!L_nD_n$. We then employed the Markov n-gram entropy method to sort the passwords. This process involved semantically breaking down passwords into identifiable segments, extracting meaningful words, and then labelling the password structure based on these components. Each password received a tag reflective of its primary element—word, name, or phrase—outlined in Table \ref{table:tags}. Passwords lacking overt semantic content were designated as R2, denoting a human-generated structure that was ambiguous to the labeller. Passwords identified as machine-generated or random received an R1 tag, while those with repetitive structures or keyboard patterns were marked as R3---see Table~\ref{table:randomtags}.
+
+After labelling the \hmail dataset, we used it to fine-tune the \texttt{Mistral-7B-v0.1} model; the dataset was formatted as JSON with system/user/assistant messages (see Listing~\ref{lst:training-hmail}.) The model was fine-tuned using parameter-efficient fine-tuning (PEFT) with QLoRA. The data set \lizardsquad was machine-labelled using this fine-tuned model. For inference, the model generated structured outputs with a maximum of 80 new tokens and a repetition penalty of 1.2. Training and inference was conducted using Pytorch and Nvidia GPUs---these were our own hardware (2 $\times$ RTX 6000 ada GPUs) and cost was negligible.
+
+
+\begin{listing}[H]
+\begin{minted}
+[
+frame=lines,
+framesep=2mm,
+baselinestretch=0.9,
+fontsize=\footnotesize,
+breaklines,
+]
+{python}
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "Given a password string, decompose the password string and provide the following data in a JSON dict: 'chunks', 'words', 'structure', 'tags', 'transformations' (if applicable)"
+    },
+    {
+      "role": "user",
+      "content": "interinato"
+    },
+    {
+      "role": "assistant",
+      "content": "{\"chunks\": \"interinato\", \"words\": \"interinato\", \"structure\": \"w\", \"tags\": \"word\", \"transformations\": \"\"}"
+    }
+  ]
+}
+\end{minted}
+\caption{An example of a labelled \hmail record formatted as JSON.}
+\label{lst:training-hmail}
+\end{listing}
+
+
 
 \begin{table}[]
     \centering

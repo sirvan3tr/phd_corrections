@@ -1,4 +1,4 @@
-\chapter{FormL3SS\\Protecting User Secrets on the Client}
+\chapter{FormL3SS:\,\\Protecting User Secrets on the Client}
 \label{chp::formless}
 
 In Chapter \ref{chp3::breaches}, we found that Man-in-the-Browser (MitB) malware (also known as \textit{form grabbers}, \textit{skimmers}, or \textit{magecart-style attacks}) can silently exfiltrate sensitive user data from web forms. As users interact increasingly with browsers and websites, the risk of sensitive data such as passwords and credit card details being stolen by MitB malware and form grabbers increases. These threats can cause serious financial and information loss. To counter such risks, we propose an alternative security measure: an out-of-band mobile phone system that protects against compromised browsers and malicious form manipulation. This chapter presents our system \formless, which includes a standardised protocol for secure information requests and integrates blockchain technology for identity verification. We showcase the effectiveness of the proposed system in securely transmitting data to a trusted server, demonstrating a fusion of traditional security techniques with blockchain systems.
@@ -54,11 +54,60 @@ With an increasing number of individuals using the Internet for online banking, 
 \section{Design}
 \label{sec::forml3ss::design}
 
-The goal of the proposed system, \formless, is to circumvent compromised operating systems, browsers and malicious third party JavaScript libraries (form grabbers), thus creating a secure link between the user and the trusted server (the server hosting the website that the user is interacting with) in order to send sensitive data (e.g. payment information). We are countering two types of attacks: 1) Man-in-the-Browser Trojans such as \textit{ZeuS} and \textit{SpyEye} (also known as financial malware). 2) Form grabbers: Malicious third party libraries that scrape the web page and send the data to a controlled server. Malicious browser extensions fall between those two forms of attack. Therefore, we assume that all interactions and data on the web page displayed on the infected client can be manipulated and altered. The proposed system, \formless, is shown in Figure~\ref{fig:thesys}.
+The goal of the proposed system, \formless, is to circumvent compromised operating systems, browsers and malicious third party JavaScript libraries (form grabbers), thus creating a secure link between the user and the trusted server (the server hosting the website that the user is interacting with) in order to send sensitive data (e.g. payment information). We are countering two types of attacks: 1) Man-in-the-Browser Trojans such as \textit{ZeuS} and \textit{SpyEye} (also known as financial malware). 2) Form grabbers: Malicious third party libraries that scrape the web page and send the data to a controlled server. Malicious browser extensions fall between those two forms of attack. Therefore, we assume that all interactions and data on the web page displayed on the infected client can be manipulated and altered. The proposed system, \formless, is shown in Figure~\ref{fig:thesys}. The communication flow between the different components of \formless is show in Figure~\ref{fig::forml3ss-sequence}.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+    >=Stealth,
+    actor/.style={rectangle, draw, minimum width=2cm, minimum height=0.4cm},
+    message/.style={->, thick},
+    return/.style={->, dashed},
+    note/.style={rectangle, draw, dashed, fill=yellow!20, align=left, font=\footnotesize}
+]
+
+\node[actor] (browser) at (0,0) {Browser};
+\node[actor] (server) at (4,0) {Server};
+\node[actor] (mobile) at (8,0) {Mobile App};
+\node[actor] (chain) at (12,0) {Blockchain};
+
+\draw[dashed] (browser) -- ++(0,-16);
+\draw[dashed] (server) -- ++(0,-16);
+\draw[dashed] (mobile) -- ++(0,-16);
+\draw[dashed] (chain) -- ++(0,-16);
+
+\node[above=0.3cm of browser] {\textbf{Initial Registration}};
+
+\draw[message] (0,-1) -- (4,-1) node[midway, above, font=\scriptsize] {1. Request form};
+\draw[message] (4,-2) -- (0,-2) node[midway, above, font=\scriptsize] {2. Signed QR data};
+\draw[message] (0,-3) -- (8,-3) node[midway, above, font=\scriptsize] {3. User scans QR};
+\node[note, right] at (8,-4) {User manually\\enters domain};
+\draw[message] (8,-5) -- (12,-5) node[midway, above, font=\scriptsize] {4. Verify signature};
+\draw[return] (12,-5.5) -- (8,-5.5) node[midway, above, font=\scriptsize] {Public key};
+\node[note, right] at (8,-6.5) {Store trusted\\relationship};
+\draw[message] (8,-7.5) -- (4,-7.5) node[midway, above, font=\scriptsize] {5. Submit data (HTTPS)};
+\draw[message] (4,-8) -- (0,-8) node[midway, above, font=\scriptsize] {6. Confirm (WebSocket)};
+
+% Second scenario: In this scenario, the user doesn't have to input domain again (nice)
+\node[above] at (6,-10) {\textbf{Subsequent Form Submission}};
+
+\draw[message] (0,-11) -- (4,-11) node[midway, above, font=\scriptsize] {1. Request form};
+\draw[message] (4,-12) -- (0,-12) node[midway, above, font=\scriptsize] {2. Signed QR data};
+\draw[message] (0,-13) -- (8,-13) node[midway, above, font=\scriptsize] {3. User scans QR};
+\node[note, right] at (8,-14) {\textcolor{green!50!black}{Auto-verify}\\No manual input};
+\draw[message] (8,-15) -- (4,-15) node[midway, above, font=\scriptsize] {4. Submit data (HTTPS)};
+\draw[message] (4,-15.5) -- (0,-15.5) node[midway, above, font=\scriptsize] {5. Confirm (WebSocket)};
+
+\end{tikzpicture}
+\caption{\formless communication flow. Here we see how the different components interact with each other and the two scenarios if the user has interacted with the service before.}
+\label{fig::forml3ss-sequence}
+\end{figure}
 
 \input{figs/forml3ss/formless_system}
 
-Given that the user's device (OS and browser) is assumed to be compromised we are using an out-of-band system to send sensitive information to the trusted web server. A mobile phone is a common device that has the ability to perform the necessary cryptographic and networking operations. Thus, a mobile phone is used to send the data securely to the web server. The data from the client (web browser) is transferred to the mobile phone via a QR code. We have built on top of the \deeid system because it already provides password-less and out-of-band authentication and thus this extends \deeid for out-of-band transfer of other data.
+
+
+The server is assumed to be secure. Therefore, the data sent to the client or the mobile phone device is assumed to be valid and verified via a signature scheme. The user's device (OS and browser) is assumed to be compromised and insecure. So, we are using an out-of-band system to send sensitive information to the trusted web server. A mobile phone is a common device that has the ability to perform the necessary cryptographic and networking operations. Thus, a mobile phone is used to send the data securely to the web server. The data from the client (web browser) is transferred to the mobile phone via a QR code. We have built on top of the \deeid system because it already provides password-less and out-of-band authentication and thus this extends \deeid for out-of-band transfer of other data.
 
 We ensure that the QR code is not manipulated by the compromised browser and client-side code. We do this as follows: a) the trusted server (hosting the website) signs the data, b) the user scans the QR code, c) the user then types in the website's domain into the mobile phone app upon being asked for it, d) the domain names are cross-checked with the scanned one from the QR code, e) the mobile phone app can now connect to the WebSocket server (given via the QR code) and ask for the authenticity of the signature, f) upon successful verification, the user will send the data.
 Asking the user to manually enter the domain name ensures there are no phishing attacks in play.
@@ -70,10 +119,10 @@ Just like humans, fictional entities like websites can also have verifiable iden
 
 \formless consists of the following components:
 \begin{itemize}
-    \item Client-side or frontend code: JavaScript code is used to transform the data from the server into a QR image.
-    \item WebSocket and server functions: A WebSocket connection is used so that the client can be updated upon confirmation (from the server) of receipt of the correct data from the mobile phone.
-    \item Mobile app: We build on top of the \deeid application to add out-of-band form transactions.
-    \item Blockchain (deeID): In Section \ref{sec:altdes}, we will see alternative designs and solutions that will utilise the blockchain and the \deeid functionality. We use the messaging function, the proof of identity, and its PKI functionality.
+    \item \textbf{Frontend}: JavaScript code is used to transform the server data into a QR image. The client is treated as insecure and therefore the manipulation of the data is verified by the mobile phone application.
+    \item \textbf{Server}: A backend is developed in Python to receive client requests, handle communication with the mobile app, and a WebSocket connection is used so that the client can be updated upon confirmation (from the server) of receiving the correct data from the mobile phone. The server is treated as secure.
+    \item \textbf{Mobile app}: We build on top of the \deeid application to add out-of-band form transactions. The mobile app is treated as secure.
+    \item \textbf{Blockchain (deeID)}: In Section \ref{sec:altdes}, we will see alternative designs and solutions that will utilise the blockchain and the \deeid functionality. We use the messaging function, the proof of identity, and its PKI functionality.
 \end{itemize}
 
 \paragraph{Form Types.}
@@ -131,7 +180,12 @@ qr_msg = json.dumps({
 \paragraph{Frontend Functionalities.} The frontend functionality is simply a QR code encoder. The client receives the data (signed) from the server and the JavaScript will create a QR image out of that data.
 
 \subsection{Mobile Application Functionalities}
-Upon reading the QR code from the compromised computer, the mobile application will attempt to verify the content and its signature. At this point the threat is that malicious actors could have a phishing server setup and have completely changed the content of the QR image to point to the phishing server. To mitigate this we ask the user to type in the domain of the site they have visited; then cross check it with the one in the QR image. The mobile app will then verify the public-key from the server.
+Upon reading the QR code from the compromised computer, the mobile application will attempt to verify the content and its signature. At this point the threat is that malicious actors could have a phishing server setup and have completely changed the content of the QR image to point to the phishing server. We mitigate using the following methods.
+
+\begin{itemize}
+    \item If this is our first interaction with the server then we ask the user to type in the domain of the site they have visited; then cross check it with the one in the QR image. The mobile app will then verify the public-key from the server.
+    \item If this is not our first interaction with the server then we may verify the identity of the server that signed the QR code with the identity we have associated with the server.
+\end{itemize}
 
 Note, phishing threats are minimised through the \deeid ecosystem if we have already established a connection with a service. This relationship is stored and any incoming communication is always verified with the stored information. 
 
@@ -205,8 +259,29 @@ If the form (assuming a custom type form) is complex and thus cannot be fully tr
 
 Instead of sending all of the form in the QR code, we only send the URL of the trusted WebSocket server (belonging to the website of interest). Upon being verified by the user on their \deeid mobile phone application, the user will begin requesting the form from the WebSocket server. At this point the process is a simple back and forth conversation between the two trusted devices.
 
-\section{Evaluation and Discussion}
+\section{Usability Evaluation}
+
+We evaluate the usability of \formless using the framework by Bonneau \etal\ in \textit{The Quest to Replace Passwords}~\cite{bonneau_quest_2012}. We used this method to evaluate \deeid in the previous chapter. We utilise the the usability section of the framework for \formless as well; the deployability and security aspects of the framework are more authentication focussed so they are not used here.
+
+\begin{enumerate}
+\item \textbf{Memorywise-Effortless}: \formless is built around \deeid from the previous chapter and therefore stores secrets and sensitive data on the mobile phone device. This eliminates the need to memorise information. Users may need to use a PIN to unlock their device or app, however, this is common operation for most users and with the advent of biometrics it is not a significant usability issue.
+
+\item \textbf{Scalable-for-Users}: \formless can store many sets of data on the mobile phone device. Scalability is not an issue for the user or the system itself.
+
+\item \textbf{Physically-Effortless}: Authentication involves scanning a QR code and confirming submission, a straightforward process comparable to tapping a card, though it assumes consistent carrying of the mobile device.
+
+\item \textbf{Easy-to-Learn}: The interface is simple and familiar; it involves scanning QR codes or following simple instructions on the device.
+
+\item \textbf{Efficient-to-Use}: The process is quick. The network operations would often take few seconds on most LTE or broadband networks. The user does not need additional software on their client, only the mobile app on their mobile phone device.
+
+\item \textbf{Infrequent-Errors}: Most of the functions are deterministic and environmental factors do not impact it. QR code scanning might introduce some source of errors (e.g. if the mobile phone camera is unable to read the QR code), however, with most modern hardware we do not foresee this being an issue.
+
+\item \textbf{Easy-Recovery-from-Loss}: This is a limitation of the current design and implementation. \formless in its current form has no recovery methods.
+\end{enumerate}
+
+\section{Discussion}
 \label{sec::chp7::discussion}
+
 Our objective has been to circumvent threats from Man-in-the-Browser malware and form grabbers. Specifically, to deny them from exfiltrating use secrets. These types of attack have been around for more than a decade, and they are here to stay. They are becoming much more sophisticated in targeting their victims and evading defences. Targeted attacks against banks and even cryptocurrency exchanges~\cite{moshailov_gozi_2019} using a mix of techniques are becoming more common now. MitB Trojans and form grabbers have primarily targeted web-based payment services and hence are commonly referred to as banking or financial malware. The primary goal of MitB and form grabbers is to essentially steal information that is being typed into a form or turn the user's actions against them (e.g. sending funds to the attacker's bank account if the user is attempting to transfer funds).
 
 It is clear that the threat from MitB and form grabbers is significant. The British Airways case is an example of the scale of the threat. We can defend against these threats through preventive techniques that would guard the user's machine from being infected, and detection techniques that would detect and eliminate the threat. However, our method has been to circumvent the threats, most helpful to a paranoid user. Moreover, whilst it is hard for the prevention and detection techniques to guard against form grabbers, our proposed system can defend the user from such a threat.
@@ -215,9 +290,11 @@ The proposed system, \formless, is an out-of-band system that uses a mobile phon
 
 Prevention and detection techniques have their own benefits. However, an out-of-band system can have superior user experience and security benefits. In the same form, data are always removed from the user experience of a website. With the proposed system that is combined with \deeid the user can store information that is commonly required from websites, such as payment and personal information, on the device (in this case a mobile phone). This stored information can be requested with the proposed standardisation of requests; e.g. payment information is requested by a \texttt{form\_type} being \texttt{card\_info}. Standardising data requests is one of the contributions of this chapter. Targeted information such as payment information can be standardised so that all devices know what data to send in order to satisfy the server without the server explicitly stating the input fields required. This reduces communication overhead.
 
-Given that we have built on top of \deeid, which in itself is a formless and passwordless authentication scheme, the system can also defend against phishing attacks. Moreover, \deeid plays an important role, as identification is crucial when dealing with sensitive information online. We consider commonly shared sensitive information to be personal information (name, date of birth, address, etc.) and payment information. These are then interlinked with the identity. Hence, the benefit of using \deeid, an identity system with \formless, is that it can increase security with respect to identity theft and financial fraud. Providing the information and also proving one's identity on the fly adds an extra layer of security.
+Given that we have built on top of \deeid, which in itself is a formless and password-less authentication scheme, the system can also defend against phishing attacks. Moreover, \deeid plays an important role, as identification is crucial when dealing with sensitive information online. We consider commonly shared sensitive information to be personal information (name, date of birth, address, etc.) and payment information. These are then interlinked with the identity. Hence, the benefit of using \deeid, an identity system with \formless, is that it can increase security with respect to identity theft and financial fraud. Providing the information and also proving one's identity on the fly adds an extra layer of security.
 
 Malware attacks from banking to ransomware attacks are becoming more sophisticated. Collaboration between criminal gangs~\cite{noauthor_business_2019} and targeted attacks~\cite{cohen_gozi_2019} enables better penetration and quicker responses to the security guards put up by individuals and organisations. IBM predicts~\cite{noauthor_ibm_2019} that using cryptocurrency, criminal gangs are shifting to targeted ransomware attacks because they can evade security forces and launder their money more effectively.
+
+\formless shares conceptual similarities with systems such as Apple Pay and Google Pay. Both make it convenient to carry out a function securely. We can take inspiration from these systems to use NFC for example to transmit data at physical points of \textit{sale}. \formless extends the principle of out-of-band secure transmission to arbitrary web form data using a different technical approach suited to the web browsing context. Using QR codes has become a common method of payment in China using the likes of WeChat---clear evidence that this method of transacting PII or payment can be scalable and reach wide adoption.
 
 The proposed system also has its own limitations. Mobile phones are also susceptible to malware attacks. As the use of mobile phone devices increases, they become more of an attractive target for malicious actors~\cite{szongott_evaluating_2012}. The fact that the user has to use an additional device to submit the form is an additional burden. However, one can argue that because they are so common it is less of a burden. Also, because the user does not constantly type in the same information, the process of submitting sensitive information is easier and more user friendly. The proposed system used \deeid, an experimental technology that generates additional complexities.
 

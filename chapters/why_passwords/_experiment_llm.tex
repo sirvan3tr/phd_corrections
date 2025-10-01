@@ -11,19 +11,56 @@ We tested the utility of freelancers from Fiverr \cite{fiverr2024} for password 
 Interestingly, the second human agent enlisted additional helpers to expedite the labelling process, resulting in errors and inconsistency despite clear instructions. This was evident in the labelling document, where some labellers resorted to copying and pasting from search engine results, prioritising speed over accuracy. In contrast, the first agent focused on accuracy, seeking detailed feedback from us, but exceeded their five-day deadline and showed inconsistency in labelling. Accounting for the hands-on help, the accuracy of the extracted words was $50\% \pm 10\%$; this characteristic was the more accurate compared to chunking, deciphering the structure and tagging the passwords. Ultimately, the output from both agents proved unreliable.
 
 
+\noteBox{The brief to the freelancers}{%
+You're given a table of 1\,000 passwords on Google Sheet and your aim is to label them with the following features:
+
+\textbf{Chunks:} Separate passwords into clear segments based on character-type changes and meaningful boundaries, e.g., \texttt{test4me} $\rightarrow$ \textit{test, 4, me}.
+
+\textbf{Words:} Extract meaningful words, including transformations back to standard form, e.g. \texttt{test4me} $\rightarrow$ \textit{test, for, me} or \texttt{g8ors} $\rightarrow$ \textit{gators}. Include names, locations, organisations, and recognisable terms.
+
+\textbf{Structure:} Map chunks using the following codes: \textbf{w} (word), \textbf{n} (name), \textbf{d} (digit), \textbf{s} (special character), \textbf{l} (letter). Examples: \texttt{test4me} = \textit{wdw}; \texttt{manterola84} = \textit{ndd}; \texttt{elingeniero20} = \textit{wwdd}.
+
+\textbf{Tags:} Classify the passwords into the following categories.
+\begin{itemize}
+    \item \textbf{word} (standard dictionary word)
+    \item \textbf{name} (given/fictional names) 
+    \item \textbf{phrase} (multiple words)
+    \item \textbf{location} (places, cities, countries)
+    \item \textbf{date} (majority date content)
+    \item \textbf{org} (organisation names)
+    \item \textbf{object} (specific items like car models)
+    \item \textbf{email/website} (email-like or URL patterns)
+    \item \textbf{kp} (keyboard patterns like qwerty)
+    \item \textbf{R1} (random/machine-generated)
+    \item \textbf{R2} (human-generated but ambiguous structure)
+    \item \textbf{R3} (repetitive patterns like abcd123)
+    \item \textbf{Transformations:} Document any modifications like leetspeak (\textit{4$\rightarrow$for, 3$\rightarrow$e}), phonetic changes (\textit{luv$\rightarrow$love}), reversals (\textit{drowssap$\rightarrow$password}), elongations (\textit{psssss}), or character substitutions (\textit{g8ors$\rightarrow$gators}).
+\end{itemize}
+
+You can label the first 50 passwords and then review them and give feedback. You already have c.30 diverse, labelled examples to get a good sense of our intent here.
+}
+
+
 
 \subsection{Language Models}
-\paragraph{Part 1.} We started by fine-tuning the \textbf{GPT-3.5-turbo-0613} model with 825 manually labelled passwords, aiming for JSON-formatted outputs. This fine-tuning was carried out using OpenAI's Python API. The fine-tuning cost was $\sim$\$5 and was completed in a few hours. Testing involved evaluating this model against 300 passwords from the same \phpbb\ distribution, distinct from the training set. This initial fine-tuning, despite using limited data, showed success; however, 41 of the 300 (13.7\%) passwords required relabelling. The model struggled with transformations, especially elongated passwords such as \password{sssssue}, \password{6etter}, and \password{vic20oria}; the latter we assume to be \texttt{"victoria"}. Tokenisation is an important aspect of language models. We believe mislabelling could stem from tokenisation as well. Conducting further tests on the tokenisation method was beyond the scope of this chapter.
+
+Can language models automate the labelling process? Language models, such as the GPT family of LLMs from OpenAI, have generalised well across various tasks, including coding. Given their large vocabularies, we believe they could be useful for automating the labelling process. In this section, we describe how we fine-tuned closed- and open-source models using supervised fine-tuning, with successful results in labelling password datasets.
+
+We fine-tuned a closed-source model (GPT-3.5-turbo) and open-source models that were downloaded from huggingface.co. For GPT-3.5-turbo, we used OpenAI's standard fine-tuning API by uploading a training file containing password-label pairs in JSON format (input: raw password; output: structured decomposition with chunks, words, structure, tags, transformations), while for the open-source models (LLaMA 2 and Mistral) we applied QLoRA (Quantized Low-Rank Adaptation), which freezes some of the model's weights and trains only small adapter layers to reduce computational requirements. The open-source models were fine-tuned using \fun{transformers}\footnote{https://github.com/huggingface/transformers} and \fun{PEFT}\footnote{https://github.com/huggingface/peft}. The evaluation process involved two experimental phases. First, three models (GPT-3.5-turbo, LLaMA2-13B, and Mistral-7B) were fine-tuned on 825 manually labelled passwords from the \phpbb dataset and tested on a separate 300-password subset from the same dataset to measure the accuracy of chunking passwords into components and extracting meaningful words. In the second phase, the training set was expanded to 1\,725 passwords, combining both the \phpbb and \hmail datasets, with the models tested on 3\,062 passwords from the \hmail dataset to evaluate cross-dataset generalisation.
+
+\paragraph{Part 1.} We started by fine-tuning the \textbf{GPT-3.5-turbo-0613} model with 825 manually labelled passwords, aiming for JSON-formatted outputs (System prompt: \textit{Given a password string, provide the following fields in a JSON dict: 'chunks', 'words', 'structure', 'tags', 'transformation' (if applicable)}.) This fine-tuning was carried out using OpenAI's Python API. The fine-tuning cost was $\sim$\$5 and was completed in a few hours. Testing involved evaluating this model against 300 passwords from the same \phpbb\ distribution, distinct from the training set. This initial fine-tuning, despite using limited data, showed success; however, 41 of the 300 (13.7\%) passwords required relabelling. The model struggled with transformations, especially elongated passwords such as \password{sssssue}, \password{6etter}, and \password{vic20oria}; the latter we assume to be \texttt{"victoria"}. Tokenisation is an important aspect of language models. We believe mislabelling could stem from tokenisation as well. Conducting further tests on the tokenisation method was beyond the scope of this chapter.
+
 
 Encouraged by promising initial results, we conducted further experiments with additional open-source models. We started with smaller models, LLaMA2-13B and Mistral7B, and fine-tuned them using LoRa~\cite{Hu_Shen_et_al_2021} and QLoRa~\cite{Dettmers_Pagnoni_Holtzman_Zettlemoyer_2023} techniques. The outcomes of the initial experiment, using an 825-labelled training set and a 300-item test set from \phpbb, are presented in Figure~\ref{fig:300comp}.
 
 \begin{figure}[t]
     \centering
     \scalebox{1}{\input{figs/why_passwords/llm_comp_300}}
-    \caption{Accuracy of three models in chunking and extracting words from a password string.The models are fine-tuned using 825 passwords from the \phpbb dataset, and are tested on a separate 300 passwords from the same dataset.}
+    \caption{Accuracy of three models in chunking and extracting words from a password string. The models are fine-tuned using 825 passwords from the \phpbb dataset, and are tested on a separate 300 passwords from the same dataset.}
     \label{fig:300comp}
     %\vspace{-1em} 
 \end{figure}
+
 %   
 \paragraph{Part 2.} In the second phase of our experiment, we augmented our training set by adding 900 passwords from the \hmail dataset. Building on the initial work with GPT-3.5 and Mistral, we expanded our test set to include 3\,062 labelled \hmail passwords. These passwords consisted primarily of characters (without digits) and were not found in dictionaries, indicating they were either phrases or obscure words. We replaced the LLaMa-13B model with a larger LLaMa2 variant, specifically using the \textit{Riiid/sheep-duck-llama-2}\footnote{\url{https://huggingface.co/Riiid/sheep-duck-llama-2-70b-v1.1}} \cite{mukherjee2023orca, platypus2023, Orca-best} model, which benefits from training on a more extensive dataset compared to the standard 70B parameter model.
 
@@ -42,5 +79,7 @@ The model does not generalise well against languages. We tested the \hmail passw
 
 All the models produced well structured JSON data regardless of the amount of data it was fine-tuned with.
 
-Our initial experiment on using language models to label passwords were successful enough to warrant future research in our opinion. Further experimentation of language model is beyond the scope of this chapter and there is significant research avenues to explore. Conducting more experiments with different prompting techniques, synthetic data, more human labelled datasets, and different models can prove beneficial.
+The results, as shown in Figures~\ref{fig:300comp} and \ref{fig:shepduckcomp}, were obtained using limited data; therefore, their applicability to a larger or an entirely different dataset may be limited. Our testing and experimentation were limited, and it is possible that the models have overfitted to a limited number of password structures. Lastly, we did not look deeply into why a 70B-parameter model performed worse than a 7B-parameter model (Figure~\ref{fig:shepduckcomp})---these are good questions that can be answered in future work.
+
+Our initial experiment on using language models to label passwords were successful enough to warrant future research in our opinion. Further experimentation of language model is beyond the scope of this chapter and there is significant research avenues to explore. Conducting more experiments with different prompting techniques, synthetic data, more human labelled datasets, and different models can prove beneficial. Moreover, using agentic or reasoning methods with the LLM might increase accuracy.
 

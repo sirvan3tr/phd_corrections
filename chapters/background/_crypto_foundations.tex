@@ -245,18 +245,18 @@ Assuming the interaction is occurring between two entities, the \textit{prover $
 \textbf{$A$'s key generation protocol is as follows:}
 
 \begin{enumerate}
-    \item Choose $k$ random numbers $S_1,...,S_k$ in $\mathbb{Z}_n$
-    \item Choose each $v_j$ (randomly and independently) as $\pm1 \cdot (S_j^2)^{-1} \mod{n}$
-    \item Publish $v_1,...,v_k$ and keep $S_1,...,S_k$ secret
+    \item Choose $k$ random numbers $s_1,...,s_k$ in $\mathbb{Z}_n$
+    \item Choose each $v_j$ (randomly and independently) as $\pm1 \cdot (s_j^2)^{-1} \mod{n}$
+    \item Publish $v_1,...,v_k$ and keep $s_1,...,s_k$ secret
 \end{enumerate}
 
 \textbf{The generation and verification process (i.e. interactions) takes place as follows through a four-step process:}
 Repeat \(t\) times:
 
-Repeat steps 3 to 6 for \(i = 1, \ldots, t\):
+Repeat steps 4 to 7 for \(i = 1, \ldots, t\):
 
 \begin{enumerate}
-    \setcounter{enumi}{2}
+    \setcounter{enumi}{3}
     \item $A$ picks a random \(r_i \in [0, n)\) and sends \(x_i = r_i^2 \pmod{n}\) to $B$.
     \item $B$ sends a random binary vector \((e_{i1}, \ldots, e_{ik})\) to $A$.
     \item $A$ sends to $B$:

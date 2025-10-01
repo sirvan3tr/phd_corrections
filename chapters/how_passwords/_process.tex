@@ -252,6 +252,13 @@ Final probability density function:
 f_L(x) = Mk \cdot \frac{e^{-k(x-x_0)}}{(1 + e^{-k(x-x_0)})^2}
 \end{equation}
 
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.7\linewidth]{figs//how_passwords/phd_equation.pdf}
+    \caption{Visualisation of Equation~\ref{eq::515}. This figure explains the variables and provides some intuition behind the equation.}
+    \label{fig::chp5::e_t_crack}
+\end{figure}
+
 Now we can calculate the expected Time to Crack for our logistic function:
 \begin{align*}
 \mathbb{E}[T_c] & = \int_0^\infty t \cdot \frac{kM\alpha e^{-k(\alpha t - x_0)}}{(1 + e^{-k(\alpha t - x_0)})^2}\,dt \\
@@ -262,7 +269,10 @@ Now we can calculate the expected Time to Crack for our logistic function:
 Our final equation then becomes:
 \begin{equation}
 \mathbb{E}[T_c] = \frac{M}{\min(\lambda, \mu)}\left(x_0 + \frac{1}{k}\right)
+\label{eq::515}
 \end{equation}
+
+Equation~\ref{eq::515} shows the expected time to crack a password. $\lambda$ represents our arrival rate (or the number of password guesses we generate using a model), whilst $\mu$ is the hashing rate (or how many password hashes we can generate per unit of time). So, $\min(\lambda, \mu)$ tells us by what our system is throttled and is the \textit{effective} password guessing rate. Together, the expression $\left(x_0 + \frac{1}{k}\right)$ scales the basic time estimate $\frac{M}{\min(\lambda, \mu)}$ to account for both initial search conditions and the probabilistic nature of password discovery. This gives us a more realistic expected completion time that reflects both the computational constraints and the stochastic aspects of the guessing process. Figure~\ref{fig::chp5::e_t_crack} provides a detailed breakdown of the equation in visual form.
 
 % TODO: Weibull distribution for expected guesses.
 %\paragraph{Weibull distribution:}
@@ -325,7 +335,7 @@ Our final equation then becomes:
     \label{fig:cracking-time}
 \end{figure}
 
-Figure \ref{fig:cracking-time} shows our result using the same models as the number of guesses section. Here we assume the process is throttled by the number of candidates the GAN models are generating, i.e. $N(t) = \lambda t$, where $\lambda$ is the arrival rate and therefore the generation speed.
+Figure~\ref{fig:cracking-time} shows our result using the same models as the number of guesses section. Here we assume the process is throttled by the number of candidates the GAN models are generating, i.e. $N(t) = \lambda t$, where $\lambda$ is the arrival rate and therefore the generation speed.
 
 For our empirical analysis, we used the same dataset configurations as in the previous guessing probability evaluation - the RockYou password leak processed to contain passwords up to 10 characters. We measured the actual time taken to generate and process password guesses using both brute-force and GAN approaches across different hardware configurations.
 
@@ -338,6 +348,20 @@ The hashing rate $\mu$ is based on \hashcat benchmarks on consumer-level hardwar
 % \end{enumerate}
 
 This empirical analysis supports our theoretical predictions about the relationship between generation rate, hash rate, and cracking success. It also highlights an important practical consideration: while sophisticated guessing strategies may be more efficient for common passwords, hardware-optimized can remain competitive and optimisation of the implementations should be considered a novel piece of work.
+
+\subsection{Other Strategies and Parallelisation}
+
+In the two-stage model considered in this chapter (candidate generation \(\rightarrow\) hash verification), the effective cracking throughput is determined by the bottleneck between the candidate generation rate \(\lambda\) and the hash-processing capability \(\mu\). Here, the application of more advanced queueing theory would be beneficial for understanding how scaling the number of workers would affect guessing rates. Moreover, future work could also incorporate cost and the economics of password guessing at scale. In Figures~\ref{fig:cracking-time}~and~\ref{fig:password-expected-guesses}, we assumed the attacker is not parallelising either \(\lambda\) or \(\mu\). The attacks are conducted on a consumer level hardware (internally the hashing might be parallelised at CPU or GPU level).
+
+Increasing the number of generator or hashing workers changes the arrival process \(N(t)\) and consequently the expected time-to-crack derived earlier. Framing parallelism in this way allows formal comparison between algorithmic improvements (better candidate ranking) and systems improvements (higher \(\lambda\) or \(\mu\)).
+
+For neural-network-based attacks, the system becomes constrained by the model’s candidate-generation rate rather than by the computational hashing throughput. Generating intelligent password candidates requires significantly more computational resources per guess than verifying them. In this scenario, we can scale the number of generators, optimise generation speed through model compression or quantisation techniques, or precompute candidates. Ultimately, the strategy to choose depends on the attacker’s intent, the type of neural network, and the target. There are leaked password dictionaries with billions of records already, so unless the neural network has better or more novel candidates, precomputing may not be useful.
+
+When scaling the candidate-generation workers for neural networks, we can theoretically match or exceed the hashing rate $\mu$, but this approach faces practical limitations due to memory-bandwidth constraints, inter-processor communication overheads, and the inherently sequential nature of some neural network operations. However, parallelisation enables neural networks to reach their maximum potential, $M$, more quickly, without fundamentally altering their learning characteristics. Therefore, we would merely reach that asymptotic ceiling more quickly while preserving the underlying intelligence limitations of the model architecture.
+
+For naive brute-force strategies, the hashing rate can be parallelised almost linearly, significantly improving $\mu$. This near-perfect parallel scaling gives brute-force approaches a significant advantage in highly parallel environments, potentially offsetting some of the intelligence-related benefits of neural approaches when sufficient computational resources are available.
+
+Our work in this section remains valid when applying parallelisation techniques, and the approach we have taken enables us to reason effectively about parallelisation. Moreover, it prepares us to carry out future experiments using queueing theory, and even to consider the economics of password-guessing strategies.
 
 % \input{chapters/how_passwords/__queue_model}
 

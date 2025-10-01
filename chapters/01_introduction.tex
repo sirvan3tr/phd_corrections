@@ -59,9 +59,9 @@ Passwords are also propped up by other techniques such as \textbf{Multi-factor A
 
 The use of MFA and difficult PCPs comes at a cost to \textbf{usability} and user experience. The use of MFA has of course made password-based schemes more secure, but at a cost to usability and user experience. In many cases, usability trumps security and privacy. The Cookie Policy and regulation was meant to give back rights to the users. The cookie policy pop-ups are a nuisance, so much so that the Brave browser, one that is security and privacy-focused, is blocking them. Users often choose the path of least resistance, and that might not be the most secure path.
 
-The \textbf{storage method} of passwords has a tremendous impact on their security. Storage is the last step in the journey of this secret, and it is a crucial step that directly affects the economy of a guessing attack. Passwords are stored as hash values $y$ using a cryptographic hash function $h$. This function is a one-way function where it takes the input (password) $x$ and creates the hash value output, $h(x) = y$. Typical cryptographic hash functions were designed to be efficient and computationally easy to compute. To deter an attacker from brute-forcing (i.e., computing $h(x) = y$ at speed), we want a function that is resistant to such an attack. These functions are known as \textit{key-derivation functions}. Data breaches often lead to the hash values $y$ being leaked, which are then cracked and revealed to the public. A research question for us is \textbf{whether alternatives to cryptographic hash functions and key-derivation functions exist}. This motivated us to explore zero-knowledge proofs, specifically identity-based cryptosystems in Chapter~\ref{chp::deeid}, which takes us into the password-less authentication territory.
+The \textbf{storage method} of passwords has a tremendous impact on their security. Storage is the last step in the journey of this secret, and it is a crucial step that directly affects the economy of a guessing attack. Passwords are stored as salted hashes, the salt is a random sequence to defend against rainbow table attacks (pre-computing the hashes of passwords). For simplicity assume passwords are stored as hash values $y$ using a cryptographic hash function $h$. This function is a one-way function where it takes the input (password) $x$ and creates the hash value output, $h(x) = y$. Typical cryptographic hash functions were designed to be efficient and computationally easy to compute. To deter an attacker from brute-forcing (i.e., computing $h(x) = y$ at speed), we want a function that is resistant to such an attack. These functions are known as \textit{key-derivation functions}. Data breaches often lead to the hash values $y$ being leaked, which are then cracked and revealed to the public. A research question for us is \textbf{whether alternatives to cryptographic hash functions and key-derivation functions exist}. This motivated us to explore zero-knowledge proofs, specifically identity-based cryptosystems in Chapter~\ref{chp::deeid}, which takes us into the password-less authentication territory.
 
-Going beyond passwords is also an active but slow area of research. \textbf{Password-less authentication} is motivated by overcoming the weaknesses of passwords and the usability issues of MFA. The ubiquity of mobile phones and the decrease in the cost of electronics are motivating the use of \textit{what you have} and \textit{what you are} forms of authentication. However, the standards that are being introduced are dogged by confusion and complexity; therefore, the implementation and adoption have been slow. Passkeys were introduced by Apple in 2022. There are privacy concerns in using cloud infrastructure for the storage of cryptographic secret keys. Password-less startups~\cite{wiggers_passwordless_2020, wiggers_passwordless_2023, kovacs_hypr_2022} are being actively invested in. This signals that there is demand for password-less technology.
+Going beyond passwords is also an active but slow area of research. \textbf{Password-less authentication} is motivated by overcoming the weaknesses of passwords and the usability issues of MFA. The ubiquity of mobile phones and the decrease in the cost of electronics are motivating the use of \textit{what you have} and \textit{what you are} forms of authentication. However, the standards that are being introduced are dogged by confusion and complexity; therefore, the implementation and adoption have been slow. Passkeys were introduced by Apple in 2022. There are privacy concerns in using cloud infrastructure for the storage of cryptographic secret keys. Password-less startups~\cite{wiggers_passwordless_2020, wiggers_passwordless_2023, kovacs_hypr_2022} are being actively invested in. This signals that there is demand for password-less technology. Services also use email-based authentication; here a secret token is sent to the user's email address to verify ownership/access.
 
 The above summary of password-based authentication systems and the journey of passwords as secrets reveals many weaknesses that demand a holistic view of security protocols. Perhaps FTX would still be around today had they not lost \$400 million to a SIM swap attack. This dissertation thus takes such an approach. We hope this approach can motivate researchers to be more daring in designing new systems and protocols in a field that is cautious and continuously reminds everyone to stick to what exists and not to innovate.
 
@@ -121,7 +121,8 @@ We contribute to the field of web security. By taking a novel perspective of the
 
 \end{itemize}
 
-\paragraph{Server-side Security.}
+\paragraph{Server-side Security.} Data leaks often contain large amounts of users’ PII and password information; this leads to credential stuffing attacks (CSAs), impersonation, and identity theft. We design and implement \deeid, which overcomes the problem of poor credential storage by using a zero-knowledge proof system and a dynamic system in which many organisations can issue identities.
+
 \begin{itemize}
 \item \textit{Fiat--Shamir cryptosystem extension:} We propose a new approach to the Fiat--Shamir cryptosystem where an ecosystem can have multiple identity issuers. The cryptosystem is explained in with its design into \deeid in Chapter~\ref{chp::deeid}.
   
@@ -143,7 +144,7 @@ We contribute to the field of web security. By taking a novel perspective of the
 
 \begin{figure}
 \centering
-\includegraphics[scale=1.5]{figs/_intro_model.pdf}
+\includegraphics[scale=0.5]{figs/summary_diagram.pdf}
 \caption{Graphical representation of the dissertation's outline. We explore the journey that user secrets take from the moment a user composes a password to their storage in the server.}
 \label{fig::chp1::thesis-outline}
 \end{figure}
@@ -163,7 +164,7 @@ Figure~\ref{fig::chp1::thesis-outline} presents a graphical representation of th
 
 I declare that this dissertation was composed by myself, and that the work it
 presents is my own, except where otherwise stated. The following
-publications arose from work conducted during the course of this PhD:
+publications arose from work conducted during the course of this PhD.
 
 \begin{itemize}
     \item S.\;Almasi and W.J.\;Knottenbelt. \textbf{Five Word Password Composition Policy}. NDSS Workshop on Measurements, Attacks, and Defenses for the Web (MADWeb 2025), San Diego, California, USA, Feb 2025.
@@ -171,14 +172,5 @@ publications arose from work conducted during the course of this PhD:
     \item S.\;Almasi and W.J.\;Knottenbelt. \textbf{Protecting Users from Compromised Browsers and Form Grabbers.} NDSS Workshop on Measurements, Attacks, and Defenses for the Web (MADWeb 2020), San Diego, California, USA, Feb 2020.
 \end{itemize}
 
-Other related work:
 
-\begin{itemize}
-    \item S. Almasi and W.J. Knottenbelt. Understanding Password Composition and Strength through Human-labelled and Real Password Datasets. 2024.
-    
-    \item S. Almasi and W.J. Knottenbelt. Security First API Modelling Techniques. 2021
-    
-    \item S. Almasi and W.J. Knottenbelt. Research Opportunities and Lessons Identified from Recent Web Security Attacks. 2021
-    
-    \item S. Almasi and W.J. Knottenbelt. Human Identity and the Quest to Replace Password Continued. 2019
-\end{itemize}
+\textit{Five Word Password Composition Policy} is the result of Chapter~4. \textit{Protecting Users from Compromised Browsers and Form Grabbers} is the result of Chapter~7.
